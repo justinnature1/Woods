@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -60,11 +61,16 @@ public class BoardScreen implements Screen
     Button resetButton;
     Button exitButton;
 
+    BitmapFont arrowKeyFont;
+
     public BoardScreen(Woods aGame, Screen aScreen, int rows, int columns)
     {
 
         this.uiStage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(uiStage); //Without this, buttons and etc will not have their event listeners activated
+
+        this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
+
 
         this.aScreen = aScreen;
         this.game = aGame;
@@ -156,6 +162,7 @@ public class BoardScreen implements Screen
         game.batch.begin();
         game.font.setColor(1, 1, 0, 1.3f);
         game.font.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 100, 150);
+        this.arrowKeyFont.draw(game.batch, "Press Left or Right Arrow keys to speed up", 100, 100);
         game.batch.end();
         /*aShape.begin(ShapeRenderer.ShapeType.Filled);
         aShape.setColor(Color.FOREST);

@@ -99,6 +99,8 @@ public class MenuScreen implements Screen
 
         aBatch.begin();
         aFont.draw(aBatch, "Welcome to Random Movement Simulator", 100, 150);
+        aBatch.end();
+        aBatch.begin();
         aFont.draw(aBatch, "Press anywhere to begin", 100, 100);
         aBatch.end();
 
