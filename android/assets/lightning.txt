@@ -1,0 +1,12 @@
+lightningsheet.png
+size: 240, 48
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+lightning
+  rotate: false
+  xy: 0, 0
+  size: 240, 48
+  orig: 240, 48
+  offset: 0, 0
+  index: -1
