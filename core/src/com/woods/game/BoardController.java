@@ -31,14 +31,14 @@ public class BoardController
 
     public BoardController(int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers)
     {
-        if (numberOfRows < 5 || numberOfColumns < 5)
+        /*if (numberOfRows < 5 || numberOfColumns < 5)
         {
             throw new IllegalArgumentException("Number of rows or number of columns must be above 9");
         }
         if (numberOfPlayers < 2)
         {
             throw new IllegalArgumentException("Number of players must be above 1");
-        }
+        }*/
 
         this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
@@ -50,8 +50,6 @@ public class BoardController
         this.aPlayers = new Player[numberOfPlayers];
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every 3 seconds of game delta time
-        this.playerMovementTimer = 0;
-
     }
 
     /**

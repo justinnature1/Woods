@@ -62,6 +62,7 @@ public class BoardScreen implements Screen
     TextureRegion exitRegion;
     Button resetButton;
     Button exitButton;
+    float totalTimesRan, totalMovements, totalPlayerMovements, average;
 
     BitmapFont arrowKeyFont;
 
@@ -128,8 +129,7 @@ public class BoardScreen implements Screen
         resetButton.setHeight((float) resetTexture.getHeight() / 3);
         resetButton.setWidth((float) resetTexture.getWidth() / 3);
         uiStage.addActor(resetButton);
-        uiStage.addActor(exitButton);
-
+        //uiStage.addActor(exitButton);
     }
 
     /**
@@ -138,7 +138,7 @@ public class BoardScreen implements Screen
     @Override
     public void show()
     {
-         adventureMusic.play();
+        adventureMusic.play();
     }
 
     public boolean findCollisions()
@@ -149,30 +149,24 @@ public class BoardScreen implements Screen
     @Override
     public void render(float delta)
     {
-        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        //Gdx.gl.glClearColor(0, 0, 0, 0);
         ScreenUtils.clear(0, 0, 0.2f, 1);
-        //Gdx.gl.glEnable(GL20.GL_BLEND);
-        //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         theCamera.update();
-        //game.batch.setProjectionMatrix(theCamera.combined);
         aShape.setProjectionMatrix(theCamera.combined);
         aBoardController.drawBoard(aShape);
-        //Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        //aBoardController.drawPlayers(aShape);
         game.batch.begin();
         game.font.setColor(1, 1, 0, 1.3f);
-        game.font.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 100, 150);
-        this.arrowKeyFont.draw(game.batch, "Press Left or Right Arrow keys to speed up", 100, 100);
+        game.font.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
+        game.font.draw(game.batch, "Average: " + average, 50, theCamera.viewportHeight - 40);
+        this.arrowKeyFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", 50, 50);
+        this.arrowKeyFont.draw(game.batch, "ESC to exit or Press R to reset", 30, 20);
         game.batch.end();
-        /*aShape.begin(ShapeRenderer.ShapeType.Filled);
-        aShape.setColor(Color.FOREST);
-        aShape.circle(0, 0, 30);
-        aShape.end();*/
-        /*game.batch.begin();
-        resetButton.draw(game.batch, 20);
-        game.batch.end();*/
+
+        game.batch.begin();
+        this.arrowKeyFont.draw(game.batch, "Rows: " + rows, 50, theCamera.viewportHeight - 70);
+        this.arrowKeyFont.draw(game.batch, "Columns: " + columns, 50, theCamera.viewportHeight - 90);
+        game.batch.end();
         uiStage.act();
         uiStage.draw();
         Input anInput = Gdx.input;
@@ -188,9 +182,11 @@ public class BoardScreen implements Screen
             }
         }
         update();
-
     }
 
+    /**
+     * Updates the state of the game (collisions and movement) and collects keyboard input
+     */
     public void update()
     {
         Input anInput = Gdx.input;
@@ -212,6 +208,7 @@ public class BoardScreen implements Screen
             {
                 aBoardController.decreaseSpeed();
             }
+            show();
             aBoardController.updatePlayers();
         }
 
@@ -219,7 +216,15 @@ public class BoardScreen implements Screen
         {
             stateOfGame = State.STOPPED;
             adventureMusic.stop();
+            totalTimesRan++;
+            totalMovements += aBoardController.totalPlayerMovements;
+            average = totalMovements / totalTimesRan;
             //aBoardController.fade(aShape);
+        }
+
+        if (anInput.isKeyPressed(Input.Keys.R))
+        {
+            this.resetBoard();
         }
 
         resetButton.addListener(new ChangeListener()
@@ -227,10 +232,7 @@ public class BoardScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                aBoardController.createArray();
-                aBoardController.createPlayersDefaultLocation();
-                stateOfGame = State.RUN;
-                aBoardController.totalPlayerMovements = 0;
+                resetBoard();
                 //resetButton.setChecked(true);
                 event.cancel();
             }
@@ -257,6 +259,18 @@ public class BoardScreen implements Screen
     public void resize(int width, int height)
     {
 
+    }
+
+    /**
+     * Resets the board and player location to defaults
+     */
+    private void resetBoard()
+    {
+        aBoardController.createArray();
+        aBoardController.createPlayersDefaultLocation();
+        stateOfGame = State.RUN;
+        aBoardController.totalPlayerMovements = 0;
+        aBoardController.playerUpdateTime = 0.3f;
     }
 
     @Override

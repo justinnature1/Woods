@@ -4,16 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.AssetLoader;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
+import javafx.scene.control.Tab;
 import sun.font.TextRecord;
+
+import java.util.concurrent.ExecutionException;
 
 import static com.badlogic.gdx.Input.*;
 
@@ -37,14 +40,23 @@ public class MenuScreen implements Screen
     Animation<TextureRegion> lightningAnimation;
     float animationStatetime;
     TextField rowTextField;
+    TextField colTextField;
+
+    TextField.TextFieldStyle rowStyle;
+    Skin someSkin;
 
     String initialText, dialogue, message;
     boolean display;
     BitmapFont aFont;
+    Table aTable;
+    TextButton beginButton;
 
 
     public MenuScreen(Woods aGame)
     {
+        someStage = new Stage();
+        Gdx.input.setInputProcessor(someStage);
+
         this.aFont = new BitmapFont();
         this.aBatch = new SpriteBatch();
         this.aGame = aGame;
@@ -57,6 +69,70 @@ public class MenuScreen implements Screen
         fruitAtlas = new TextureAtlas("fruit.txt");
         bananaSprite = fruitAtlas.createSprite("banana");
         animationStatetime = 0f;
+
+        someSkin = new Skin();
+
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        someSkin.add("white", new Texture(pixmap));
+        someSkin.add("default", new BitmapFont());
+
+        TextField.TextFieldStyle textFieldStyleThing = new TextField.TextFieldStyle();
+        textFieldStyleThing.background = someSkin.newDrawable("white", Color.DARK_GRAY);
+        textFieldStyleThing.font = new BitmapFont();
+        textFieldStyleThing.fontColor = Color.WHITE;
+        textFieldStyleThing.selection = someSkin.newDrawable("white", Color.CORAL);
+        textFieldStyleThing.cursor = someSkin.newDrawable("white", Color.BLACK);
+        textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.font = new BitmapFont();
+        textButtonStyle.fontColor = Color.CHARTREUSE;
+        textButtonStyle.up = someSkin.newDrawable("white", Color.FIREBRICK);
+        textButtonStyle.down = someSkin.newDrawable("white", Color.BLACK);
+        textButtonStyle.checked = someSkin.newDrawable("white", Color.BLUE);
+
+        someSkin.add("default", textButtonStyle);
+
+        beginButton = new TextButton("START", textButtonStyle);
+
+        someSkin.add("meow", textFieldStyleThing);
+
+        rowStyle = new TextField.TextFieldStyle();
+        rowStyle.font = new BitmapFont();
+
+        //someSkin.add("default", rowStyle);
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = new BitmapFont();
+        someSkin.add("default", labelStyle);
+
+        rowTextField = new TextField(String.valueOf(rows), textFieldStyleThing);
+        colTextField = new TextField(String.valueOf(columns), textFieldStyleThing);
+        //rowStyle.background = someSkin.newDrawable();
+        rowStyle.fontColor = Color.WHITE;
+        //rowTextField.setText("Rows");
+
+        Label rowLabel = new Label("Rows: ", someSkin);
+        Label colLabel = new Label("Columns:  ", someSkin);
+        //Label welcomeLabel = new Label(Welcome)
+
+        Table rootTable = new Table();
+        //rootTable.setFillParent(true);
+        rootTable.add(rowLabel).pad(10);
+        rootTable.add(rowTextField);
+        rootTable.row();
+        rootTable.add(colLabel).pad(10);
+        rootTable.add(colTextField);
+        rootTable.row();
+        rootTable.add(beginButton).width(100).height(50).colspan(2);
+
+        rootTable.setY(150);
+        rootTable.setX(camera.viewportWidth / 2);
+
+        someStage.addActor(rootTable);
+        createListeners();
+
         createTexture();
     }
 
@@ -67,7 +143,7 @@ public class MenuScreen implements Screen
     {
         TextureRegion[] lightningFrames = new TextureRegion[5];
 
-        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth()/5, lightningTexture.getHeight());
+        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
 
         int index = 0;
         for (TextureRegion[] arrayOfRegions : tempers)
@@ -88,6 +164,70 @@ public class MenuScreen implements Screen
 
     }
 
+    /**
+     * Creates listeners for the various textfields and buttons
+     */
+    private void createListeners()
+    {
+        rowTextField.setTextFieldListener(new TextField.TextFieldListener()
+        {
+            @Override
+            public void keyTyped(TextField textField, char c)
+            {
+                boolean done = false;
+
+                while (!done)
+                {
+                    try
+                    {
+                        rows = Integer.parseInt(textField.getText());
+                        done = true;
+                    } catch (Exception e)
+                    {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            }
+        });
+
+        colTextField.setTextFieldListener(new TextField.TextFieldListener()
+        {
+            @Override
+            public void keyTyped(TextField textField, char c)
+            {
+                boolean done = false;
+
+                while (!done)
+                {
+                    try
+                    {
+                        columns = Integer.parseInt(textField.getText());
+                        done = true;
+                    } catch (Exception e)
+                    {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            }
+        });
+
+        beginButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
+            }
+        });
+    }
+
+    /**
+     * Draws to the screen, a rasterizer
+     *
+     * @param delta float
+     */
     @Override
     public void render(float delta)
     {
@@ -99,10 +239,10 @@ public class MenuScreen implements Screen
         aBatch.setProjectionMatrix(camera.combined);
 
         aBatch.begin();
-        aFont.draw(aBatch, "Welcome to Random Movement Simulator", 100, 150);
+        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth/2-100, camera.viewportHeight/2+100);
         aBatch.end();
         aBatch.begin();
-        aFont.draw(aBatch, "Press anywhere to begin", 100, 100);
+        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth/2-100, camera.viewportHeight/2 + 50);
         aBatch.end();
 
         TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
@@ -111,17 +251,20 @@ public class MenuScreen implements Screen
         aBatch.draw(currentFrame, 50, 50);
         aBatch.end();
 
-        //basicUI.render();
+        someStage.act();
+        someStage.draw();
 
         this.update();
-
     }
 
+    /**
+     * Gathers keyboard input, for now
+     */
     public void update()
     {
         Input anInput = Gdx.input;
 
-        if (anInput.isTouched() || anInput.isKeyPressed(Keys.ENTER))
+        if (anInput.isKeyPressed(Keys.B))
         {
             aGame.setScreen(new BoardScreen(aGame, this, rows, columns));
         }
