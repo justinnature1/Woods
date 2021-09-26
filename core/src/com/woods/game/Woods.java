@@ -9,13 +9,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+/**
+ * Main class for the game
+ * Name: Robert Zafaripour
+ * This game will simply simulate a collision from several players on a tile board.
+ * Framework: libGDX
+ */
 public class Woods extends Game
 {
 	SpriteBatch batch;
 	Texture img;
 	BitmapFont font;
 	Label.LabelStyle aLabelStyle;
-	
+
+	/**
+	 * Basic creation method
+	 */
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -32,7 +41,10 @@ public class Woods extends Game
 	public void render () {
 		super.render();
 	}
-	
+
+	/**
+	 * Each class that extends the game class must have a dispose method to get rid of objects
+	 */
 	@Override
 	public void dispose () {
 		batch.dispose();
