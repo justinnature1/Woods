@@ -1,5 +1,8 @@
 package com.woods.game;
 
+/**
+ * A class that works like the Board class but has an array to hold more 'blocks or pieces' in a single tile
+ */
 public class BoardOfPieces
 {
 

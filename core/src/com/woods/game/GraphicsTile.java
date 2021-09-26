@@ -4,6 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
+/**
+ * This class creates a graphics tile class, which are simple rectangles. This class will scale depending on the number of rows
+ * and columns
+ */
 public class GraphicsTile extends Block
 {
 
@@ -36,6 +40,10 @@ public class GraphicsTile extends Block
         //aShape.end();
     }
 
+    /**
+     * This simply draws a single graphics tile (rectangle)
+     * @param aShape ShapeRenderer
+     */
     @Override
     public void draw(ShapeRenderer aShape)
     {

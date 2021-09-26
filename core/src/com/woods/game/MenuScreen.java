@@ -17,6 +17,9 @@ import sun.font.TextRecord;
 
 import static com.badlogic.gdx.Input.*;
 
+/**
+ * This implements a menu screen for the game.
+ */
 public class MenuScreen implements Screen
 {
     Stage someStage;
@@ -57,7 +60,6 @@ public class MenuScreen implements Screen
         createTexture();
     }
 
-    //TODO Create animation class for textures
     /**
      * Just a temporary method until a proper texture animation class is created
      */
@@ -78,7 +80,6 @@ public class MenuScreen implements Screen
         }
 
         lightningAnimation = new Animation<TextureRegion>(0.025f, lightningFrames);
-
     }
 
     @Override

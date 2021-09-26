@@ -1,21 +1,22 @@
 package com.woods.game;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
 public class Pieces
 {
 
-    ArrayList<Block> totalPieces;
+    Array<Block> totalPieces;
 
     //TODO Change
     public Pieces()
     {
-        totalPieces = new ArrayList<>();
+        totalPieces = new Array<>();
     }
 
-    public ArrayList<Block> getTotalPieces()
+    public Array<Block> getTotalPieces()
     {
         return totalPieces;
     }
@@ -27,10 +28,10 @@ public class Pieces
 
     public void removePiece(Block aPiece)
     {
-        totalPieces.remove(aPiece);
+        totalPieces.removeValue(aPiece,true);
     }
 
-    public void setTotalPieces(ArrayList<Block> totalPieces)
+    public void setTotalPieces(Array<Block> totalPieces)
     {
         this.totalPieces = totalPieces;
     }

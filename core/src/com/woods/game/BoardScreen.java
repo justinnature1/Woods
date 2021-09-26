@@ -25,7 +25,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sun.prism.shader.Solid_TextureRGB_AlphaTest_Loader;
 
 
-//TODO Add music and sounds
+/**
+ * This will implement a 'Board screen' for the actual gameplay
+ */
 public class BoardScreen implements Screen
 {
     /**
@@ -52,8 +54,8 @@ public class BoardScreen implements Screen
     State stateOfGame;
     Stage uiStage;
 
-    Button.ButtonStyle resetButtonStyle;
-    Button.ButtonStyle exitButtonStyle;
+    final Button.ButtonStyle resetButtonStyle;
+    final Button.ButtonStyle exitButtonStyle;
     Texture resetTexture;
     Texture exitTexture;
     TextureRegion resetRegion;
@@ -158,7 +160,7 @@ public class BoardScreen implements Screen
         aBoardController.drawBoard(aShape);
         //Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        aBoardController.drawPlayers(aShape);
+        //aBoardController.drawPlayers(aShape);
         game.batch.begin();
         game.font.setColor(1, 1, 0, 1.3f);
         game.font.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 100, 150);
@@ -217,8 +219,7 @@ public class BoardScreen implements Screen
         {
             stateOfGame = State.STOPPED;
             adventureMusic.stop();
-            aBoardController.fade(aShape);
-
+            //aBoardController.fade(aShape);
         }
 
         resetButton.addListener(new ChangeListener()
@@ -242,10 +243,14 @@ public class BoardScreen implements Screen
             {
                 //Woods aWoods = new Woods();
                 //aWoods.setScreen(new MenuScreen(aWoods));
-                game.setScreen(new MenuScreen(game));
-
+                changeScreens();
             }
         });
+    }
+
+    private void changeScreens()
+    {
+        this.game.setScreen(new MenuScreen(game));
     }
 
     @Override
