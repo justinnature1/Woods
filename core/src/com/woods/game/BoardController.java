@@ -50,6 +50,7 @@ public class BoardController
         this.aPlayers = new Player[numberOfPlayers];
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every 3 seconds of game delta time
+        this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
     }
 
     /**
@@ -208,6 +209,11 @@ public class BoardController
         {
             playerUpdateTime -= 0.01f;
         }
+    }
+
+    public Music getAdventureMusic()
+    {
+        return adventureMusic;
     }
 
     /**

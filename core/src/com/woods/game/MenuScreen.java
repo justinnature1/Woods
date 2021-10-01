@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import javafx.scene.control.Tab;
 import sun.font.TextRecord;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static com.badlogic.gdx.Input.*;
@@ -35,6 +36,8 @@ public class MenuScreen implements Screen
     int rows;
     int columns;
     Texture lightningTexture;
+    Texture rainTextureOne;
+    Texture rainTextureTwo;
     TextureAtlas fruitAtlas;
     Sprite bananaSprite;
     Animation<TextureRegion> lightningAnimation;
@@ -48,8 +51,9 @@ public class MenuScreen implements Screen
     String initialText, dialogue, message;
     boolean display;
     BitmapFont aFont;
-    Table aTable;
+    Table rootTable;
     TextButton beginButton;
+    Animations raindrops;
 
 
     public MenuScreen(Woods aGame)
@@ -66,10 +70,57 @@ public class MenuScreen implements Screen
         this.columns = 10;
         this.rows = 10;
         lightningTexture = new Texture(Gdx.files.internal("lightning.png"));
+        rainTextureOne = new Texture(Gdx.files.internal("rain-0.png"));
+        rainTextureTwo = new Texture(Gdx.files.internal("rain-1.png"));
+
         fruitAtlas = new TextureAtlas("fruit.txt");
         bananaSprite = fruitAtlas.createSprite("banana");
         animationStatetime = 0f;
 
+        ArrayList<Texture> someTextures = new ArrayList<>();
+        someTextures.add(rainTextureOne);
+        someTextures.add(rainTextureTwo);
+        raindrops = new Animations(someTextures, 30, 0.03f);
+
+        rootTable = new Table();
+        rootTable.add(raindrops);
+
+        createButtons();
+
+        createTexture();
+    }
+
+    /**
+     * Just a temporary method until a proper texture animation class is created
+     */
+    public void createTexture()
+    {
+        TextureRegion[] lightningFrames = new TextureRegion[5];
+
+        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
+
+
+        int index = 0;
+        for (TextureRegion[] arrayOfRegions : tempers)
+        {
+            for (TextureRegion aRegion : arrayOfRegions)
+            {
+                lightningFrames[index] = aRegion;
+                index++;
+            }
+        }
+
+        lightningAnimation = new Animation<TextureRegion>(0.025f, lightningFrames);
+    }
+
+    @Override
+    public void show()
+    {
+
+    }
+
+    private void createButtons()
+    {
         someSkin = new Skin();
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -117,7 +168,6 @@ public class MenuScreen implements Screen
         Label colLabel = new Label("Columns:  ", someSkin);
         //Label welcomeLabel = new Label(Welcome)
 
-        Table rootTable = new Table();
         //rootTable.setFillParent(true);
         rootTable.add(rowLabel).pad(10);
         rootTable.add(rowTextField);
@@ -132,36 +182,6 @@ public class MenuScreen implements Screen
 
         someStage.addActor(rootTable);
         createListeners();
-
-        createTexture();
-    }
-
-    /**
-     * Just a temporary method until a proper texture animation class is created
-     */
-    public void createTexture()
-    {
-        TextureRegion[] lightningFrames = new TextureRegion[5];
-
-        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
-
-        int index = 0;
-        for (TextureRegion[] arrayOfRegions : tempers)
-        {
-            for (TextureRegion aRegion : arrayOfRegions)
-            {
-                lightningFrames[index] = aRegion;
-                index++;
-            }
-        }
-
-        lightningAnimation = new Animation<TextureRegion>(0.025f, lightningFrames);
-    }
-
-    @Override
-    public void show()
-    {
-
     }
 
     /**
@@ -239,16 +259,22 @@ public class MenuScreen implements Screen
         aBatch.setProjectionMatrix(camera.combined);
 
         aBatch.begin();
-        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth/2-100, camera.viewportHeight/2+100);
+        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 100);
         aBatch.end();
         aBatch.begin();
-        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth/2-100, camera.viewportHeight/2 + 50);
+        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 50);
         aBatch.end();
 
         TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
 
         aBatch.begin();
         aBatch.draw(currentFrame, 50, 50);
+        aBatch.end();
+
+        currentFrame = raindrops.anAnimation.getKeyFrame(animationStatetime, true);
+
+        aBatch.begin();
+        aBatch.draw(currentFrame, 50, 100);
         aBatch.end();
 
         someStage.act();
