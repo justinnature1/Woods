@@ -53,7 +53,7 @@ public class MenuScreen implements Screen
     BitmapFont aFont;
     Table rootTable;
     TextButton beginButton;
-    Animations raindrops;
+    Background raindropsBackground;
 
 
     public MenuScreen(Woods aGame)
@@ -66,6 +66,7 @@ public class MenuScreen implements Screen
         this.aGame = aGame;
         this.aShape = new ShapeRenderer();
         this.camera = new OrthographicCamera();
+        this.rootTable = new Table();
         camera.setToOrtho(false, 800, 480);
         this.columns = 10;
         this.rows = 10;
@@ -80,14 +81,13 @@ public class MenuScreen implements Screen
         ArrayList<Texture> someTextures = new ArrayList<>();
         someTextures.add(rainTextureOne);
         someTextures.add(rainTextureTwo);
-        raindrops = new Animations(someTextures, 30, 0.03f);
 
-        rootTable = new Table();
-        rootTable.add(raindrops);
+        raindropsBackground = new Background(aGame.backgroundTextures, 30, .05f, camera, 4, 4);
 
         createButtons();
 
         createTexture();
+
     }
 
     /**
@@ -257,6 +257,7 @@ public class MenuScreen implements Screen
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
         aBatch.setProjectionMatrix(camera.combined);
+        raindropsBackground.draw(aBatch, animationStatetime);
 
         aBatch.begin();
         aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 100);
@@ -271,11 +272,6 @@ public class MenuScreen implements Screen
         aBatch.draw(currentFrame, 50, 50);
         aBatch.end();
 
-        currentFrame = raindrops.anAnimation.getKeyFrame(animationStatetime, true);
-
-        aBatch.begin();
-        aBatch.draw(currentFrame, 50, 100);
-        aBatch.end();
 
         someStage.act();
         someStage.draw();

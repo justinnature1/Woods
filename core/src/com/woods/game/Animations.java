@@ -5,25 +5,31 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Texture Sprite Sheet class to merge multiple sprite sheets together
  */
-public class Animations extends Actor
+public class Animations
 {
     //TODO Finish proper draw implementation and update method
 
-    ArrayList<Texture> someTextures;
+    Array<Texture> someTextures;
     TextureRegion[] animationFrames;
     Animation<TextureRegion> anAnimation;
+    int columns, rows;
 
-    public Animations(ArrayList<Texture> textures, int size, float frameDuration)
+    public Animations(Array<Texture> someTextures, int size, float frameDuration, int rows, int columns)
     {
         //this.animationFrames = animationFrames;
         animationFrames = new TextureRegion[size];
-        this.someTextures = textures;
+        this.someTextures = someTextures;
+        this.rows = rows;
+        this.columns = columns;
         createTexture();
         anAnimation = new Animation<TextureRegion>(frameDuration, animationFrames);
 
@@ -35,9 +41,9 @@ public class Animations extends Actor
     private void createTexture()
     {
         int index = 0;
-        for (Texture aTexture : someTextures)
+        for (Texture aTexture: someTextures)
         {
-            TextureRegion[][] tempers = TextureRegion.split(aTexture, aTexture.getWidth() / 4, aTexture.getHeight() / 4);
+            TextureRegion[][] tempers = TextureRegion.split(aTexture, aTexture.getWidth() / rows, aTexture.getHeight() / columns);
 
             for (TextureRegion[] arrayOfRegions : tempers)
             {
@@ -50,9 +56,9 @@ public class Animations extends Actor
         }
     }
 
-    @Override
+
     public void draw(Batch batch, float parentAlpha)
     {
-        super.draw(batch, parentAlpha);
+
     }
 }
