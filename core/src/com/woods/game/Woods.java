@@ -26,6 +26,7 @@ public class Woods extends Game
     BitmapFont font;
     Label.LabelStyle aLabelStyle;
     Array<Texture> backgroundTextures;
+    HashMap<String, Texture> menuTextures;
 
     /**
      * Basic creation method
@@ -35,6 +36,7 @@ public class Woods extends Game
     {
         batch = new SpriteBatch();
         backgroundTextures = new Array<>();
+        menuTextures = new HashMap<>();
         addTextures();
         this.font = new BitmapFont();
         aLabelStyle = new Label.LabelStyle();
@@ -72,5 +74,8 @@ public class Woods extends Game
         Texture rain1 = new Texture(Gdx.files.internal("rain-1.png"));
         backgroundTextures.add(rain0);
         backgroundTextures.add(rain1);
+
+        Texture deadTree = new Texture(Gdx.files.internal("deadTree.png"));
+        menuTextures.put("DeadTree", deadTree);
     }
 }

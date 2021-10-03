@@ -166,23 +166,28 @@ public class BoardController
 
     public void drawBoard(ShapeRenderer renderer)
     {
+        renderer.begin(ShapeRenderer.ShapeType.Line);
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
         {
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
+
                 Pieces somePiece = tileBoard.getPiecesArray()[i][j];
                 somePiece.draw(renderer);
                 //aBlock.draw(renderer);
             }
         }
+        renderer.end();
     }
 
     public void drawPlayers(ShapeRenderer renderer)
     {
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Player somePlayer : aPlayers)
         {
             somePlayer.draw(renderer);
         }
+        renderer.end();
     }
 
     public void fade(ShapeRenderer renderer)

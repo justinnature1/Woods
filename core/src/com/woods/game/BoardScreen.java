@@ -156,6 +156,7 @@ public class BoardScreen implements Screen
         theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
         aBoardController.drawBoard(aShape);
+        aBoardController.drawPlayers(aShape);
 
         game.batch.begin();
         game.font.setColor(1, 1, 0, 1.3f);

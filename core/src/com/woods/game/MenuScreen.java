@@ -85,9 +85,8 @@ public class MenuScreen implements Screen
         raindropsBackground = new Background(aGame.backgroundTextures, 30, .05f, camera, 4, 4);
 
         createButtons();
-
         createTexture();
-
+        addVisualTextures();
     }
 
     /**
@@ -182,6 +181,24 @@ public class MenuScreen implements Screen
 
         someStage.addActor(rootTable);
         createListeners();
+    }
+
+    /**
+     * Just adds some background textures to the main menu
+     */
+    private void addVisualTextures()
+    {
+        Table someTable = new Table();
+        someTable.setX(50);
+        someTable.setY(100);
+        Texture aTexture = aGame.menuTextures.get("DeadTree");
+        Image treeImage = new Image(aTexture);
+        someTable.add(treeImage).size(50).colspan(3);
+        someTable.row();
+
+        //rootTable.row() ;
+        rootTable.add(someTable);
+        //someStage.addActor(treeImage);
     }
 
     /**

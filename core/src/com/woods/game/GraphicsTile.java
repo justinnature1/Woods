@@ -47,10 +47,8 @@ public class GraphicsTile extends Block
     @Override
     public void draw(ShapeRenderer aShape)
     {
-        aShape.begin(ShapeRenderer.ShapeType.Line);
         aShape.setColor(super.color);
         aShape.rect(xArrayLocation * width, yArrayLocation * height, width, height);
-        aShape.end();
     }
 
     public String drawText()
