@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static com.badlogic.gdx.Input.*;
@@ -33,6 +34,8 @@ public class MenuScreen implements Screen
     int rows;
     int columns;
     Texture lightningTexture;
+    Texture rainTextureOne;
+    Texture rainTextureTwo;
     TextureAtlas fruitAtlas;
     Sprite bananaSprite;
     Animation<TextureRegion> lightningAnimation;
@@ -46,8 +49,9 @@ public class MenuScreen implements Screen
     String initialText, dialogue, message;
     boolean display;
     BitmapFont aFont;
-    Table aTable;
+    Table rootTable;
     TextButton beginButton;
+    Background raindropsBackground;
 
 
     public MenuScreen(Woods aGame)
@@ -60,14 +64,60 @@ public class MenuScreen implements Screen
         this.aGame = aGame;
         this.aShape = new ShapeRenderer();
         this.camera = new OrthographicCamera();
+        this.rootTable = new Table();
         camera.setToOrtho(false, 800, 480);
         this.columns = 10;
         this.rows = 10;
         lightningTexture = new Texture(Gdx.files.internal("lightning.png"));
+        rainTextureOne = new Texture(Gdx.files.internal("rain-0.png"));
+        rainTextureTwo = new Texture(Gdx.files.internal("rain-1.png"));
+
         fruitAtlas = new TextureAtlas("fruit.txt");
         bananaSprite = fruitAtlas.createSprite("banana");
         animationStatetime = 0f;
 
+        ArrayList<Texture> someTextures = new ArrayList<>();
+        someTextures.add(rainTextureOne);
+        someTextures.add(rainTextureTwo);
+
+        raindropsBackground = new Background(aGame.backgroundTextures, 30, .05f, camera, 4, 4);
+
+        createButtons();
+        createTexture();
+        addVisualTextures();
+    }
+
+    /**
+     * Just a temporary method until a proper texture animation class is created
+     */
+    public void createTexture()
+    {
+        TextureRegion[] lightningFrames = new TextureRegion[5];
+
+        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
+
+
+        int index = 0;
+        for (TextureRegion[] arrayOfRegions : tempers)
+        {
+            for (TextureRegion aRegion : arrayOfRegions)
+            {
+                lightningFrames[index] = aRegion;
+                index++;
+            }
+        }
+
+        lightningAnimation = new Animation<TextureRegion>(0.025f, lightningFrames);
+    }
+
+    @Override
+    public void show()
+    {
+
+    }
+
+    private void createButtons()
+    {
         someSkin = new Skin();
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -115,7 +165,6 @@ public class MenuScreen implements Screen
         Label colLabel = new Label("Columns:  ", someSkin);
         //Label welcomeLabel = new Label(Welcome)
 
-        Table rootTable = new Table();
         //rootTable.setFillParent(true);
         rootTable.add(rowLabel).pad(10);
         rootTable.add(rowTextField);
@@ -130,36 +179,24 @@ public class MenuScreen implements Screen
 
         someStage.addActor(rootTable);
         createListeners();
-
-        createTexture();
     }
 
     /**
-     * Just a temporary method until a proper texture animation class is created
+     * Just adds some background textures to the main menu
      */
-    public void createTexture()
+    private void addVisualTextures()
     {
-        TextureRegion[] lightningFrames = new TextureRegion[5];
+        Table someTable = new Table();
+        someTable.setX(50);
+        someTable.setY(100);
+        Texture aTexture = aGame.menuTextures.get("DeadTree");
+        Image treeImage = new Image(aTexture);
+        someTable.add(treeImage).size(50).colspan(3);
+        someTable.row();
 
-        TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
-
-        int index = 0;
-        for (TextureRegion[] arrayOfRegions : tempers)
-        {
-            for (TextureRegion aRegion : arrayOfRegions)
-            {
-                lightningFrames[index] = aRegion;
-                index++;
-            }
-        }
-
-        lightningAnimation = new Animation<TextureRegion>(0.025f, lightningFrames);
-    }
-
-    @Override
-    public void show()
-    {
-
+        //rootTable.row() ;
+        rootTable.add(someTable);
+        //someStage.addActor(treeImage);
     }
 
     /**
@@ -235,12 +272,13 @@ public class MenuScreen implements Screen
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
         aBatch.setProjectionMatrix(camera.combined);
+        raindropsBackground.draw(aBatch, animationStatetime);
 
         aBatch.begin();
-        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth/2-100, camera.viewportHeight/2+100);
+        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 100);
         aBatch.end();
         aBatch.begin();
-        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth/2-100, camera.viewportHeight/2 + 50);
+        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 50);
         aBatch.end();
 
         TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
@@ -248,6 +286,7 @@ public class MenuScreen implements Screen
         aBatch.begin();
         aBatch.draw(currentFrame, 50, 50);
         aBatch.end();
+
 
         someStage.act();
         someStage.draw();

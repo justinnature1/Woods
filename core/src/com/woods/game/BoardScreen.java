@@ -91,7 +91,7 @@ public class BoardScreen implements Screen
         aBoardController.createPlayersDefaultLocation();
 
         adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
-        adventureMusic.setLooping(true);
+        //adventureMusic.setLooping(true);
         conflict = false;
         stateOfGame = State.RUN;
         Skin someSkin = new Skin();
@@ -128,6 +128,7 @@ public class BoardScreen implements Screen
         resetButton.setHeight((float) resetTexture.getHeight() / 3);
         resetButton.setWidth((float) resetTexture.getWidth() / 3);
         uiStage.addActor(resetButton);
+        //adventureMusic.play();
         //uiStage.addActor(exitButton);
     }
 
@@ -137,7 +138,8 @@ public class BoardScreen implements Screen
     @Override
     public void show()
     {
-        adventureMusic.play();
+        //adventureMusic.play();
+        aBoardController.getAdventureMusic().play();
     }
 
     public boolean findCollisions()
@@ -153,6 +155,7 @@ public class BoardScreen implements Screen
         theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
         aBoardController.drawBoard(aShape);
+        aBoardController.drawPlayers(aShape);
 
         game.batch.begin();
         game.font.setColor(1, 1, 0, 1.3f);
@@ -193,7 +196,9 @@ public class BoardScreen implements Screen
         if (anInput.isKeyPressed(Input.Keys.ESCAPE))
         {
             //ScreenUtils.clear(0, 0, 02.f, 1);
-            this.game.setScreen(new MenuScreen(game));
+            adventureMusic.stop();
+            changeScreens();
+            //this.game.setScreen(new MenuScreen(game));
             //hide();
         }
 
@@ -207,7 +212,7 @@ public class BoardScreen implements Screen
             {
                 aBoardController.decreaseSpeed();
             }
-            show();
+            aBoardController.getAdventureMusic().play();
             aBoardController.updatePlayers();
         }
 
@@ -223,7 +228,7 @@ public class BoardScreen implements Screen
 
         if (anInput.isKeyPressed(Input.Keys.R))
         {
-            this.resetBoard();
+            resetBoard();
         }
 
         resetButton.addListener(new ChangeListener()
@@ -242,8 +247,6 @@ public class BoardScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                //Woods aWoods = new Woods();
-                //aWoods.setScreen(new MenuScreen(aWoods));
                 changeScreens();
             }
         });
@@ -251,7 +254,11 @@ public class BoardScreen implements Screen
 
     private void changeScreens()
     {
+        stateOfGame = State.STOPPED;
+        aBoardController.getAdventureMusic().stop();
+        this.dispose();
         this.game.setScreen(new MenuScreen(game));
+        //this.game.setScreen(aScreen);
     }
 
     @Override
@@ -270,6 +277,7 @@ public class BoardScreen implements Screen
         stateOfGame = State.RUN;
         aBoardController.totalPlayerMovements = 0;
         aBoardController.playerUpdateTime = 0.3f;
+        aBoardController.getAdventureMusic().stop();
     }
 
     @Override
@@ -287,7 +295,7 @@ public class BoardScreen implements Screen
     @Override
     public void hide()
     {
-        this.dispose();
+        adventureMusic.stop();
     }
 
     /**

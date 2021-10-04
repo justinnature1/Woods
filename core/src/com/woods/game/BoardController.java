@@ -50,6 +50,7 @@ public class BoardController
         this.aPlayers = new Player[numberOfPlayers];
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every 3 seconds of game delta time
+        this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
     }
 
     /**
@@ -165,23 +166,28 @@ public class BoardController
 
     public void drawBoard(ShapeRenderer renderer)
     {
+        renderer.begin(ShapeRenderer.ShapeType.Line);
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
         {
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
+
                 Pieces somePiece = tileBoard.getPiecesArray()[i][j];
                 somePiece.draw(renderer);
                 //aBlock.draw(renderer);
             }
         }
+        renderer.end();
     }
 
     public void drawPlayers(ShapeRenderer renderer)
     {
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Player somePlayer : aPlayers)
         {
             somePlayer.draw(renderer);
         }
+        renderer.end();
     }
 
     public void fade(ShapeRenderer renderer)
@@ -208,6 +214,11 @@ public class BoardController
         {
             playerUpdateTime -= 0.01f;
         }
+    }
+
+    public Music getAdventureMusic()
+    {
+        return adventureMusic;
     }
 
     /**
