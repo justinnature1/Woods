@@ -228,8 +228,8 @@ public class BoardController
                 {
                     //playerBoard.boardArray[somePlayer.yArrayLocation][somePlayer.xArrayLocation] = somePlayer;
                     //playerBoard.boardArray[oldYArrayLocation][oldXArrayLocation] = null;
-                    tileBoard.getPiecesArray()[oldYArrayLocation][oldXArrayLocation].removePiece(somePlayer);
-                    tileBoard.getPiecesArray()[somePlayer.yArrayLocation][somePlayer.xArrayLocation].addPiece(somePlayer);
+                    //tileBoard.getPiecesArray()[oldYArrayLocation][oldXArrayLocation].removePiece(somePlayer);
+                    //tileBoard.getPiecesArray()[somePlayer.yArrayLocation][somePlayer.xArrayLocation].addPiece(somePlayer);
                 }
                 assert somePlayer.yArrayLocation < numberOfRows;
             }
