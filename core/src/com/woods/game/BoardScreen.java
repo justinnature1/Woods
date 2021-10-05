@@ -1,12 +1,10 @@
 package com.woods.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,11 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.*;
 
 
 /**
@@ -41,6 +37,7 @@ public class BoardScreen implements Screen
     }
 
     OrthographicCamera theCamera;
+    Viewport aViewport;
     //Board aBoard;
     BoardController aBoardController;
     Woods game;
@@ -65,11 +62,9 @@ public class BoardScreen implements Screen
 
     BitmapFont arrowKeyFont;
 
-    public BoardScreen(Woods aGame, Screen aScreen, int rows, int columns)
+    public BoardScreen(Woods aGame, MenuScreen aScreen, int rows, int columns)
     {
 
-        this.uiStage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(uiStage); //Without this, buttons and etc will not have their event listeners activated
 
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
 
@@ -79,8 +74,14 @@ public class BoardScreen implements Screen
         this.rows = rows;
         this.columns = columns;
         this.aShape = new ShapeRenderer();
-        theCamera = new OrthographicCamera();
-        theCamera.setToOrtho(true, 800, 480);
+        theCamera = aScreen.camera;
+        aViewport = aScreen.aViewport;
+        this.uiStage = new Stage(aViewport);
+
+        Gdx.input.setInputProcessor(uiStage); //Without this, buttons and etc will not have their event listeners activated
+
+
+        theCamera.setToOrtho(false);
 
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
@@ -152,15 +153,15 @@ public class BoardScreen implements Screen
     {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
-        theCamera.update();
+        //theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
         aBoardController.drawBoard(aShape);
         aBoardController.drawPlayers(aShape);
 
         game.batch.begin();
-        game.font.setColor(1, 1, 0, 1.3f);
-        game.font.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
-        game.font.draw(game.batch, "Average: " + average, 50, theCamera.viewportHeight - 40);
+        game.monoFont.setColor(1, 1, 0, 1.3f);
+        game.monoFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
+        game.monoFont.draw(game.batch, "Average: " + average, 50, theCamera.viewportHeight - 40);
         this.arrowKeyFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", 50, 50);
         this.arrowKeyFont.draw(game.batch, "ESC to exit or Press R to reset", 30, 20);
         game.batch.end();
@@ -264,7 +265,8 @@ public class BoardScreen implements Screen
     @Override
     public void resize(int width, int height)
     {
-
+        aViewport.update(width, height);
+        uiStage.getViewport().update(width, height);
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.woods.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,10 +7,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Main class for the game
@@ -23,7 +20,8 @@ public class Woods extends Game
 {
     SpriteBatch batch;
     Texture img;
-    BitmapFont font;
+    BitmapFont monoFont;
+    BitmapFont medievalFont;
     Label.LabelStyle aLabelStyle;
     Array<Texture> backgroundTextures;
     HashMap<String, Texture> menuTextures;
@@ -38,11 +36,12 @@ public class Woods extends Game
         backgroundTextures = new Array<>();
         menuTextures = new HashMap<>();
         addTextures();
-        this.font = new BitmapFont();
+        this.monoFont = new BitmapFont();
+        this.medievalFont = new BitmapFont(Gdx.files.internal("leela.fnt"));
         aLabelStyle = new Label.LabelStyle();
         aLabelStyle.font = new BitmapFont(Gdx.files.internal("monofnt.fnt"));
         img = new Texture("badlogic.jpg");
-        this.font = new BitmapFont(Gdx.files.internal("monofnt.fnt"));
+        this.monoFont = new BitmapFont(Gdx.files.internal("monofnt.fnt"));
         this.setScreen(new MenuScreen(this));
 
     }
@@ -65,7 +64,6 @@ public class Woods extends Game
         {
             aTexture.dispose();
         }
-
     }
 
     private void addTextures()

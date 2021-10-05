@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ public class MenuScreen implements Screen
     Woods aGame;
 
     OrthographicCamera camera;
+    Viewport aViewport;
     Board aBoard;
     ShapeRenderer aShape;
     SpriteBatch aBatch;
@@ -53,19 +55,28 @@ public class MenuScreen implements Screen
     TextButton beginButton;
     Background raindropsBackground;
 
+    final float WORLD_WIDTH = 100;
+    final float WORLD_HEIGHT = 100;
+
+
 
     public MenuScreen(Woods aGame)
     {
-        someStage = new Stage();
-        Gdx.input.setInputProcessor(someStage);
 
         this.aFont = new BitmapFont();
         this.aBatch = new SpriteBatch();
         this.aGame = aGame;
         this.aShape = new ShapeRenderer();
-        this.camera = new OrthographicCamera();
+        this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
         this.rootTable = new Table();
-        camera.setToOrtho(false, 800, 480);
+        camera.setToOrtho(false);
+        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        aViewport = new StretchViewport(camera.viewportWidth, camera.viewportHeight, camera);
+        aViewport.apply();
+        //aViewport.setScreenPosition(10, 10);
+
+        someStage = new Stage(aViewport);
+
         this.columns = 10;
         this.rows = 10;
         lightningTexture = new Texture(Gdx.files.internal("lightning.png"));
@@ -96,7 +107,6 @@ public class MenuScreen implements Screen
 
         TextureRegion[][] tempers = TextureRegion.split(lightningTexture, lightningTexture.getWidth() / 5, lightningTexture.getHeight());
 
-
         int index = 0;
         for (TextureRegion[] arrayOfRegions : tempers)
         {
@@ -113,7 +123,7 @@ public class MenuScreen implements Screen
     @Override
     public void show()
     {
-
+        Gdx.input.setInputProcessor(someStage);
     }
 
     private void createButtons()
@@ -157,12 +167,14 @@ public class MenuScreen implements Screen
 
         rowTextField = new TextField(String.valueOf(rows), textFieldStyleThing);
         colTextField = new TextField(String.valueOf(columns), textFieldStyleThing);
+        //rowTextField.setSize(2, 2);
         //rowStyle.background = someSkin.newDrawable();
         rowStyle.fontColor = Color.WHITE;
         //rowTextField.setText("Rows");
 
         Label rowLabel = new Label("Rows: ", someSkin);
         Label colLabel = new Label("Columns:  ", someSkin);
+        //colLabel.setSize(2, 2);
         //Label welcomeLabel = new Label(Welcome)
 
         //rootTable.setFillParent(true);
@@ -172,12 +184,13 @@ public class MenuScreen implements Screen
         rootTable.add(colLabel).pad(10);
         rootTable.add(colTextField);
         rootTable.row();
-        rootTable.add(beginButton).width(100).height(50).colspan(2);
+        rootTable.add(beginButton).colspan(10);
 
-        rootTable.setY(150);
-        rootTable.setX(camera.viewportWidth / 2);
+        rootTable.setY(camera.viewportHeight/2 - 100);
+        rootTable.setX(camera.viewportWidth/2);
 
         someStage.addActor(rootTable);
+        someStage.setViewport(aViewport);
         createListeners();
     }
 
@@ -187,11 +200,11 @@ public class MenuScreen implements Screen
     private void addVisualTextures()
     {
         Table someTable = new Table();
-        someTable.setX(50);
-        someTable.setY(100);
+        someTable.setX(0);
+        someTable.setY(0);
         Texture aTexture = aGame.menuTextures.get("DeadTree");
         Image treeImage = new Image(aTexture);
-        someTable.add(treeImage).size(50).colspan(3);
+        someTable.add(treeImage).size(100).colspan(3);
         someTable.row();
 
         //rootTable.row() ;
@@ -275,7 +288,10 @@ public class MenuScreen implements Screen
         raindropsBackground.draw(aBatch, animationStatetime);
 
         aBatch.begin();
-        aFont.draw(aBatch, "Welcome to Random Movement Simulator", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 100);
+        aGame.medievalFont.setColor(Color.WHITE);
+        //aGame.medievalFont.getData().setScale(0.1f, 0.1f);
+        //aGame.medievalFont.draw(aBatch, "Welcome", 0, 0, 5, 2, true);
+        aGame.medievalFont.draw(aBatch, "Welcome to Wandering Woods!", camera.viewportWidth / 2, camera.viewportHeight / 2);
         aBatch.end();
         aBatch.begin();
         aFont.draw(aBatch, "Press START to begin", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 50);
@@ -284,7 +300,7 @@ public class MenuScreen implements Screen
         TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
 
         aBatch.begin();
-        aBatch.draw(currentFrame, 50, 50);
+        aBatch.draw(currentFrame, 10, 10, 10, 10);
         aBatch.end();
 
 
@@ -310,7 +326,8 @@ public class MenuScreen implements Screen
     @Override
     public void resize(int width, int height)
     {
-
+        someStage.getViewport().update(width, height);
+        this.aViewport.update(width, height);
     }
 
     @Override
