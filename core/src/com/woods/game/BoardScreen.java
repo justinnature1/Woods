@@ -130,7 +130,7 @@ public class BoardScreen implements Screen
         resetButton.setWidth((float) resetTexture.getWidth() / 3);
         uiStage.addActor(resetButton);
         //adventureMusic.play();
-        //uiStage.addActor(exitButton);
+        uiStage.addActor(exitButton);
     }
 
     /**
@@ -257,8 +257,8 @@ public class BoardScreen implements Screen
     {
         stateOfGame = State.STOPPED;
         aBoardController.getAdventureMusic().stop();
-        this.dispose();
-        this.game.setScreen(new MenuScreen(game));
+        //this.dispose();
+        this.game.setScreen(aScreen);
         //this.game.setScreen(aScreen);
     }
 
@@ -310,6 +310,7 @@ public class BoardScreen implements Screen
         aScreen.dispose();
         adventureMusic.dispose();
         uiStage.dispose();
+
         //game.dispose();
     }
 }

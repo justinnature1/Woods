@@ -74,6 +74,8 @@ public class Woods extends Game
         backgroundTextures.add(rain1);
 
         Texture deadTree = new Texture(Gdx.files.internal("deadTree.png"));
+        Texture slantedTree = new Texture(Gdx.files.internal("slantedTree.png"));
+        menuTextures.put("SlantedTree", slantedTree);
         menuTextures.put("DeadTree", deadTree);
     }
 }

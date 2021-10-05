@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.*;
 
@@ -53,11 +54,15 @@ public class MenuScreen implements Screen
     BitmapFont aFont;
     Table rootTable;
     TextButton beginButton;
+    Button exitButton;
+    Button.ButtonStyle buttonStyle;
+    Texture exitTexture;
     Background raindropsBackground;
+    ImageButton imageButtonOfTree;
+
 
     final float WORLD_WIDTH = 100;
     final float WORLD_HEIGHT = 100;
-
 
 
     public MenuScreen(Woods aGame)
@@ -96,6 +101,7 @@ public class MenuScreen implements Screen
         createButtons();
         createTexture();
         addVisualTextures();
+
     }
 
     /**
@@ -138,18 +144,36 @@ public class MenuScreen implements Screen
 
         TextField.TextFieldStyle textFieldStyleThing = new TextField.TextFieldStyle();
         textFieldStyleThing.background = someSkin.newDrawable("white", Color.DARK_GRAY);
-        textFieldStyleThing.font = new BitmapFont();
+        textFieldStyleThing.font = aGame.medievalFont;
         textFieldStyleThing.fontColor = Color.WHITE;
         textFieldStyleThing.selection = someSkin.newDrawable("white", Color.CORAL);
         textFieldStyleThing.cursor = someSkin.newDrawable("white", Color.BLACK);
         textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
 
+
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = new BitmapFont();
+        textButtonStyle.font = aGame.medievalFont;
         textButtonStyle.fontColor = Color.CHARTREUSE;
         textButtonStyle.up = someSkin.newDrawable("white", Color.FIREBRICK);
         textButtonStyle.down = someSkin.newDrawable("white", Color.BLACK);
         textButtonStyle.checked = someSkin.newDrawable("white", Color.BLUE);
+        textButtonStyle.over = someSkin.newDrawable("white", Color.CYAN);
+
+        buttonStyle = new Button.ButtonStyle();
+        exitTexture = new Texture(Gdx.files.internal("exit.png"));
+        TextureRegion exitRegion = new TextureRegion(exitTexture);
+        someSkin.add("red", exitTexture); //Hashmap creation to access texture by the key of 'red'
+        buttonStyle.up = new TextureRegionDrawable(exitRegion);
+        buttonStyle.over = someSkin.newDrawable("red", Color.CYAN);
+        exitButton = new Button(buttonStyle);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+
+        Texture slantedTreeTexture = aGame.menuTextures.get("SlantedTree");
+        Image slantedTreeImage = new Image(slantedTreeTexture);
+        slantedTreeImage.setSize(300, 300);
+        slantedTreeImage.setX(camera.viewportWidth-400);
+        slantedTreeImage.setY(camera.viewportHeight-450);
+
 
         someSkin.add("default", textButtonStyle);
 
@@ -158,11 +182,11 @@ public class MenuScreen implements Screen
         someSkin.add("meow", textFieldStyleThing);
 
         rowStyle = new TextField.TextFieldStyle();
-        rowStyle.font = new BitmapFont();
+        rowStyle.font = aGame.medievalFont;
 
         //someSkin.add("default", rowStyle);
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = new BitmapFont();
+        labelStyle.font = aGame.medievalFont;
         someSkin.add("default", labelStyle);
 
         rowTextField = new TextField(String.valueOf(rows), textFieldStyleThing);
@@ -174,23 +198,54 @@ public class MenuScreen implements Screen
 
         Label rowLabel = new Label("Rows: ", someSkin);
         Label colLabel = new Label("Columns:  ", someSkin);
-        //colLabel.setSize(2, 2);
-        //Label welcomeLabel = new Label(Welcome)
+        Label welcome = new Label("Welcome to Wandering Woods", someSkin);
+        Label clickToBegin = new Label("Click Tree to begin", someSkin);
 
-        //rootTable.setFillParent(true);
-        rootTable.add(rowLabel).pad(10);
+        Texture treeTexture = aGame.menuTextures.get("DeadTree");
+        TextureRegion treeRegion = new TextureRegion(treeTexture);
+        ImageButton.ImageButtonStyle imageStyle = new ImageButton.ImageButtonStyle();
+        Image treeImage = new Image(treeRegion);
+        treeImage.setSize(400, 400);
+        treeImage.setY(camera.viewportHeight-500);
+        someSkin.add("tree", treeRegion);
+        imageStyle.up = new TextureRegionDrawable(treeRegion);
+        imageStyle.over = someSkin.newDrawable("tree", Color.RED);
+        ImageButton imageButtonOfTree = new ImageButton(imageStyle);
+
+        imageButtonOfTree.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
+            }
+        });
+
+        rootTable = new Table();
+        rootTable.setY(camera.viewportHeight / 2);
+        rootTable.setX(camera.viewportWidth / 2);
+        rootTable.row().padBottom(100);
+
+        rootTable.add(welcome).width(30).padRight(200);
+        rootTable.row(); //Adds a new row
+        rootTable.add(rowLabel);
         rootTable.add(rowTextField);
         rootTable.row();
-        rootTable.add(colLabel).pad(10);
+        rootTable.add(colLabel);
         rootTable.add(colTextField);
         rootTable.row();
-        rootTable.add(beginButton).colspan(10);
+        rootTable.add(imageButtonOfTree).size(100, 100);
+        rootTable.add(clickToBegin);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
 
-        rootTable.setY(camera.viewportHeight/2 - 100);
-        rootTable.setX(camera.viewportWidth/2);
-
+        someStage.addActor(slantedTreeImage);
+        someStage.addActor(treeImage);
+        someStage.addActor(rootTable);
+        someStage.addActor(exitButton);
         someStage.addActor(rootTable);
         someStage.setViewport(aViewport);
+
         createListeners();
     }
 
@@ -199,16 +254,10 @@ public class MenuScreen implements Screen
      */
     private void addVisualTextures()
     {
-        Table someTable = new Table();
-        someTable.setX(0);
-        someTable.setY(0);
-        Texture aTexture = aGame.menuTextures.get("DeadTree");
-        Image treeImage = new Image(aTexture);
-        someTable.add(treeImage).size(100).colspan(3);
-        someTable.row();
 
-        //rootTable.row() ;
-        rootTable.add(someTable);
+        rootTable.row();
+        rootTable.add(imageButtonOfTree).size(100, 100);
+
         //someStage.addActor(treeImage);
     }
 
@@ -238,6 +287,7 @@ public class MenuScreen implements Screen
                 }
             }
         });
+
 
         colTextField.setTextFieldListener(new TextField.TextFieldListener()
         {
@@ -269,6 +319,17 @@ public class MenuScreen implements Screen
                 aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
             }
         });
+
+        exitButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                Gdx.app.exit();
+            }
+        });
+
+
     }
 
     /**
@@ -287,22 +348,11 @@ public class MenuScreen implements Screen
         aBatch.setProjectionMatrix(camera.combined);
         raindropsBackground.draw(aBatch, animationStatetime);
 
-        aBatch.begin();
-        aGame.medievalFont.setColor(Color.WHITE);
-        //aGame.medievalFont.getData().setScale(0.1f, 0.1f);
-        //aGame.medievalFont.draw(aBatch, "Welcome", 0, 0, 5, 2, true);
-        aGame.medievalFont.draw(aBatch, "Welcome to Wandering Woods!", camera.viewportWidth / 2, camera.viewportHeight / 2);
-        aBatch.end();
-        aBatch.begin();
-        aFont.draw(aBatch, "Press START to begin", camera.viewportWidth / 2 - 100, camera.viewportHeight / 2 + 50);
-        aBatch.end();
-
         TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
 
         aBatch.begin();
         aBatch.draw(currentFrame, 10, 10, 10, 10);
         aBatch.end();
-
 
         someStage.act();
         someStage.draw();
