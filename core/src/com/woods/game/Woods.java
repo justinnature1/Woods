@@ -25,7 +25,7 @@ public class Woods extends Game
     Label.LabelStyle aLabelStyle;
     Array<Texture> backgroundTextures;
     HashMap<String, Texture> menuTextures;
-    Array<Texture> boardTextures;
+    Texture[] boardTextures;
 
     /**
      * Basic creation method
@@ -36,7 +36,7 @@ public class Woods extends Game
         batch = new SpriteBatch();
         backgroundTextures = new Array<>();
         menuTextures = new HashMap<>();
-        boardTextures = new Array<>();
+        boardTextures = new Texture[10];
 
 
         addTextures();
@@ -64,7 +64,7 @@ public class Woods extends Game
     {
         batch.dispose();
         img.dispose();
-        for (Texture aTexture: backgroundTextures)
+        for (Texture aTexture : backgroundTextures)
         {
             aTexture.dispose();
         }
@@ -93,9 +93,17 @@ public class Woods extends Game
         Texture tree9 = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"));
         Texture tree10 = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"));
 
-        boardTextures.add(tree1, tree2, tree3, tree4);
-        boardTextures.add(tree5, tree6, tree7, tree8);
-        boardTextures.add(tree9, tree10);
+        boardTextures[0] = tree1;
+        boardTextures[1] = tree2;
+        boardTextures[2] = tree3;
+        boardTextures[3] = tree4;
+        boardTextures[4] = tree5;
+        boardTextures[5] = tree6;
+        boardTextures[6] = tree7;
+        boardTextures[7] = tree8;
+        boardTextures[8] = tree9;
+        boardTextures[9] = tree10;
+
         Texture blueTile = new Texture(Gdx.files.internal("blueTile.png"));
 
     }

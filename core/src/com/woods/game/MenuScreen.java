@@ -347,12 +347,6 @@ public class MenuScreen implements Screen
         aBatch.setProjectionMatrix(camera.combined);
         raindropsBackground.draw(aBatch, animationStatetime);
 
-        TextureRegion currentFrame = lightningAnimation.getKeyFrame(animationStatetime, true);
-
-        aBatch.begin();
-        aBatch.draw(currentFrame, 10, 10, 10, 10);
-        aBatch.end();
-
         someStage.act();
         someStage.draw();
 

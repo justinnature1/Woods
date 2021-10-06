@@ -156,11 +156,18 @@ public class BoardScreen implements Screen
 
         //theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
-        aBoardController.drawBoard(game.batch);
-        //aBoardController.drawBoard(aShape);
+
+        //Next few lines Draws Players and rectangles on board
+        aShape.begin(ShapeRenderer.ShapeType.Line);
+        aBoardController.drawBoard(aShape);
+        aShape.setAutoShapeType(true);
+        aShape.set(ShapeRenderer.ShapeType.Filled);
         aBoardController.drawPlayers(aShape);
+        aShape.end();
 
         game.batch.begin();
+        aBoardController.drawBoard(game.batch); //Draws textures on board
+
         game.monoFont.setColor(1, 1, 0, 1.3f);
         game.medievalFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
         game.monoFont.draw(game.batch, "Average: " + average, 50, theCamera.viewportHeight - 40);

@@ -44,7 +44,14 @@ public class TextureTile extends Block
     @Override
     public void draw(SpriteBatch aBatch)
     {
-        aBatch.draw(textureRegion, xArrayLocation * width, yArrayLocation * height, width, height);
+        if (width > height)
+        {
+            aBatch.draw(texture, xArrayLocation * width, yArrayLocation * height, height, height);
+        }
+        else
+        {
+            aBatch.draw(texture, xArrayLocation * width, yArrayLocation * height, width, width);
+        }
     }
 
     @Override

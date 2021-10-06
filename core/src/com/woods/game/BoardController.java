@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -172,24 +173,30 @@ public class BoardController
 
     /**
      * Takes an array of textures and randomly places them on every block on the gameboard
-     * @param someTextures Array<Texture>
+     * @param textureArray Texture[]
      */
-    public void createArrayOfTextures(Array<Texture> someTextures)
+    public void createArrayOfTextures(Texture[] textureArray)
     {
         Random aRan = new Random();
+        Texture aTexture;
+        int arrayTextureIndex;
+        GraphicsTile aRectTile;
+        TextureTile aTile;
+        Pieces somePiece;
 
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
         {
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
-                int arraySelection = aRan.nextInt(10);
-                Texture aTexture = someTextures.get(arraySelection);
+                arrayTextureIndex = aRan.nextInt(10);
+                aTexture = textureArray[arrayTextureIndex]; //Too many different textures will slow down HTML build, GWT is slow
 
-                TextureTile aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
-                //GraphicsTile aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
-                Pieces somePiece = new Pieces();
+                aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
+                aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
+                somePiece = new Pieces();
                 tileBoard.getPiecesArray()[i][j] = somePiece;
                 somePiece.addPiece(aTile);
+                somePiece.addPiece(aRectTile);
 
             }
         }
@@ -197,7 +204,6 @@ public class BoardController
 
     public void drawBoard(ShapeRenderer renderer)
     {
-        renderer.begin(ShapeRenderer.ShapeType.Line);
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
         {
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
@@ -208,12 +214,10 @@ public class BoardController
                 //aBlock.draw(renderer);
             }
         }
-        renderer.end();
     }
 
     public void drawBoard(SpriteBatch aBatch)
     {
-        aBatch.begin();
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
         {
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
@@ -224,17 +228,14 @@ public class BoardController
                 //aBlock.draw(renderer);
             }
         }
-        aBatch.end();
     }
 
     public void drawPlayers(ShapeRenderer renderer)
     {
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Player somePlayer : aPlayers)
         {
             somePlayer.draw(renderer);
         }
-        renderer.end();
     }
 
     public void fade(ShapeRenderer renderer)
