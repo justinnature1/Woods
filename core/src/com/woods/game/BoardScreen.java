@@ -157,7 +157,7 @@ public class BoardScreen implements Screen
         //theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
         aBoardController.drawBoard(game.batch);
-        aBoardController.drawBoard(aShape);
+        //aBoardController.drawBoard(aShape);
         aBoardController.drawPlayers(aShape);
 
         game.batch.begin();
@@ -198,6 +198,7 @@ public class BoardScreen implements Screen
      */
     public void update()
     {
+        //TODO Write a pause text when pressing spacebar
         Input anInput = Gdx.input;
 
         if (anInput.isKeyPressed(Input.Keys.ESCAPE))
