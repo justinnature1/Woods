@@ -25,6 +25,7 @@ public class Woods extends Game
     Label.LabelStyle aLabelStyle;
     Array<Texture> backgroundTextures;
     HashMap<String, Texture> menuTextures;
+    Array<Texture> boardTextures;
 
     /**
      * Basic creation method
@@ -35,6 +36,9 @@ public class Woods extends Game
         batch = new SpriteBatch();
         backgroundTextures = new Array<>();
         menuTextures = new HashMap<>();
+        boardTextures = new Array<>();
+
+
         addTextures();
         this.monoFont = new BitmapFont();
         this.medievalFont = new BitmapFont(Gdx.files.internal("leela.fnt"));
@@ -77,5 +81,22 @@ public class Woods extends Game
         Texture slantedTree = new Texture(Gdx.files.internal("slantedTree.png"));
         menuTextures.put("SlantedTree", slantedTree);
         menuTextures.put("DeadTree", deadTree);
+
+        Texture tree1 = new Texture(Gdx.files.internal("Tree_Pine_00.png"));
+        Texture tree2 = new Texture(Gdx.files.internal("Tree_Pine_01.png"));
+        Texture tree3 = new Texture(Gdx.files.internal("Tree_Pine_02.png"));
+        Texture tree4 = new Texture(Gdx.files.internal("Tree_Pine_03.png"));
+        Texture tree5 = new Texture(Gdx.files.internal("Tree_Pine_04.png"));
+        Texture tree6 = new Texture(Gdx.files.internal("Tree_Pine_Snow_00.png"));
+        Texture tree7 = new Texture(Gdx.files.internal("Tree_Pine_Snow_01.png"));
+        Texture tree8 = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"));
+        Texture tree9 = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"));
+        Texture tree10 = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"));
+
+        boardTextures.add(tree1, tree2, tree3, tree4);
+        boardTextures.add(tree5, tree6, tree7, tree8);
+        boardTextures.add(tree9, tree10);
+        Texture blueTile = new Texture(Gdx.files.internal("blueTile.png"));
+
     }
 }

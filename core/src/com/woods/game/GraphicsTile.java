@@ -1,6 +1,7 @@
 package com.woods.game;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -26,7 +27,6 @@ public class GraphicsTile extends Block
         this.width = width;
         this.height = height;
         //rect = new Rectangle(xDrawLocation, yDrawLocation, width, yDrawLocation);
-
     }
 
     @Override
@@ -49,6 +49,15 @@ public class GraphicsTile extends Block
     {
         aShape.setColor(super.color);
         aShape.rect(xArrayLocation * width, yArrayLocation * height, width, height);
+    }
+
+    @Override
+    public void draw(SpriteBatch aShape)
+    {
+        //ShapeRenderer aRenderer = new ShapeRenderer();
+        //aRenderer.begin(ShapeRenderer.ShapeType.Line);
+        //aRenderer.rect(xArrayLocation * width, yArrayLocation * height, width, height);
+
     }
 
     public String drawText()

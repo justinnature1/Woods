@@ -1,5 +1,6 @@
 package com.woods.game;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 
@@ -41,6 +42,14 @@ public class Pieces
         for (Block aBlock : this.totalPieces)
         {
             aBlock.draw(renderer);
+        }
+    }
+
+    public void draw(SpriteBatch aBatch)
+    {
+        for (Block aBlock : this.totalPieces)
+        {
+            aBlock.draw(aBatch);
         }
     }
 

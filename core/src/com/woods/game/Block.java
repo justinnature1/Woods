@@ -2,6 +2,7 @@ package com.woods.game;
 
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public abstract class Block
@@ -49,6 +50,9 @@ public abstract class Block
 
 
     public abstract void draw(ShapeRenderer aShape);
+
+    public abstract void draw(SpriteBatch aShape);
+
 
     /**
      * Fades an object out while it's drawn, fading it out of existence

@@ -1,6 +1,7 @@
 package com.woods.game;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.Random;
@@ -113,6 +114,12 @@ public class Player extends Block
         aShape.circle(xDrawLocation, yDrawLocation, radius);
         //aShape.end();
         //drawText();
+    }
+
+    @Override
+    public void draw(SpriteBatch aShape)
+    {
+
     }
 
     /**

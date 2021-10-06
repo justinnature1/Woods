@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -88,7 +89,8 @@ public class BoardScreen implements Screen
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
         aBoardController = new BoardController(rows, columns, (theCamera.viewportWidth - rightSideBuffer) / columns, (theCamera.viewportHeight - bottomEdgeBuffer) / rows, 4);
-        aBoardController.createArray();
+
+        aBoardController.createArrayOfTextures(aGame.boardTextures);
         aBoardController.createPlayersDefaultLocation();
 
         adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
@@ -120,7 +122,8 @@ public class BoardScreen implements Screen
         resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.5f);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
         resetButton.setX(theCamera.viewportWidth - 150);
-        resetButton.setY(10);
+        Vector3 aVector = new Vector3(3, 150, 0);
+        resetButton.setY(theCamera.project(aVector).y);
         exitButton.setY(10);
         exitButton.setX(10);
 
@@ -148,6 +151,7 @@ public class BoardScreen implements Screen
         return aBoardController.playerConflict();
     }
 
+
     @Override
     public void render(float delta)
     {
@@ -155,6 +159,7 @@ public class BoardScreen implements Screen
 
         //theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
+        aBoardController.drawBoard(game.batch);
         aBoardController.drawBoard(aShape);
         aBoardController.drawPlayers(aShape);
 
@@ -239,7 +244,7 @@ public class BoardScreen implements Screen
             {
                 resetBoard();
                 //resetButton.setChecked(true);
-                event.cancel();
+                //event.cancel();
             }
         });
 
@@ -274,7 +279,8 @@ public class BoardScreen implements Screen
      */
     private void resetBoard()
     {
-        aBoardController.createArray();
+
+        //aBoardController.createArrayOfTextures(game.boardTextures);
         aBoardController.createPlayersDefaultLocation();
         stateOfGame = State.RUN;
         aBoardController.totalPlayerMovements = 0;

@@ -76,7 +76,7 @@ public class MenuScreen implements Screen
         this.rootTable = new Table();
         camera.setToOrtho(false);
         //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-        aViewport = new StretchViewport(camera.viewportWidth, camera.viewportHeight, camera);
+        aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
         aViewport.apply();
         //aViewport.setScreenPosition(10, 10);
 

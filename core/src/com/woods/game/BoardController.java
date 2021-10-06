@@ -3,9 +3,15 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * This is a Board controller class that controls the state of the game board.
@@ -164,6 +170,31 @@ public class BoardController
         }
     }
 
+    /**
+     * Takes an array of textures and randomly places them on every block on the gameboard
+     * @param someTextures Array<Texture>
+     */
+    public void createArrayOfTextures(Array<Texture> someTextures)
+    {
+        Random aRan = new Random();
+
+        for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
+        {
+            for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
+            {
+                int arraySelection = aRan.nextInt(10);
+                Texture aTexture = someTextures.get(arraySelection);
+
+                TextureTile aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
+                //GraphicsTile aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
+                Pieces somePiece = new Pieces();
+                tileBoard.getPiecesArray()[i][j] = somePiece;
+                somePiece.addPiece(aTile);
+
+            }
+        }
+    }
+
     public void drawBoard(ShapeRenderer renderer)
     {
         renderer.begin(ShapeRenderer.ShapeType.Line);
@@ -178,6 +209,22 @@ public class BoardController
             }
         }
         renderer.end();
+    }
+
+    public void drawBoard(SpriteBatch aBatch)
+    {
+        aBatch.begin();
+        for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
+        {
+            for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
+            {
+
+                Pieces somePiece = tileBoard.getPiecesArray()[i][j];
+                somePiece.draw(aBatch);
+                //aBlock.draw(renderer);
+            }
+        }
+        aBatch.end();
     }
 
     public void drawPlayers(ShapeRenderer renderer)
