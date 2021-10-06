@@ -3,12 +3,10 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -17,7 +15,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.*;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static com.badlogic.gdx.Input.*;
 
@@ -53,7 +50,7 @@ public class MenuScreen implements Screen
     boolean display;
     BitmapFont aFont;
     Table rootTable;
-    TextButton beginButton;
+    TextButton startButton;
     Button exitButton;
     Button.ButtonStyle buttonStyle;
     Texture exitTexture;
@@ -177,7 +174,7 @@ public class MenuScreen implements Screen
 
         someSkin.add("default", textButtonStyle);
 
-        beginButton = new TextButton("START", textButtonStyle);
+        startButton = new TextButton("START", textButtonStyle);
 
         someSkin.add("meow", textFieldStyleThing);
 
@@ -311,7 +308,8 @@ public class MenuScreen implements Screen
             }
         });
 
-        beginButton.addListener(new ChangeListener()
+        //This button will change to the gameplay screen
+        startButton.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
@@ -320,6 +318,7 @@ public class MenuScreen implements Screen
             }
         });
 
+        //This button will exit the game in the main menu
         exitButton.addListener(new ChangeListener()
         {
             @Override

@@ -46,7 +46,6 @@ public class BoardScreen implements Screen
     int rows;
     int columns;
     Screen aScreen;
-    Music adventureMusic;
     boolean conflict;
     State stateOfGame;
     Stage uiStage;
@@ -93,8 +92,6 @@ public class BoardScreen implements Screen
         aBoardController.createArrayOfTextures(aGame.boardTextures);
         aBoardController.createPlayersDefaultLocation();
 
-        adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
-        //adventureMusic.setLooping(true);
         conflict = false;
         stateOfGame = State.RUN;
         Skin someSkin = new Skin();
@@ -119,20 +116,15 @@ public class BoardScreen implements Screen
 
         exitButton = new Button(exitButtonStyle);
         resetButton = new Button(resetButtonStyle);
-        resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.5f);
-        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
-        resetButton.setX(theCamera.viewportWidth - 150);
-        Vector3 aVector = new Vector3(3, 150, 0);
-        resetButton.setY(theCamera.project(aVector).y);
-        exitButton.setY(10);
-        exitButton.setX(10);
+        resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.8f);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
+        resetButton.setX(theCamera.viewportWidth - 110);
 
-        exitButton.setHeight((float) exitTexture.getHeight() / 6);
-        exitButton.setWidth((float) exitTexture.getWidth() / 6);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
         resetButton.setHeight((float) resetTexture.getHeight() / 3);
         resetButton.setWidth((float) resetTexture.getWidth() / 3);
         uiStage.addActor(resetButton);
-        //adventureMusic.play();
         uiStage.addActor(exitButton);
     }
 
@@ -146,6 +138,11 @@ public class BoardScreen implements Screen
         aBoardController.getAdventureMusic().play();
     }
 
+    /**
+     * Finds collisions among the players
+     *
+     * @return boolean
+     */
     public boolean findCollisions()
     {
         return aBoardController.playerConflict();
@@ -165,13 +162,17 @@ public class BoardScreen implements Screen
 
         game.batch.begin();
         game.monoFont.setColor(1, 1, 0, 1.3f);
-        game.monoFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
+        game.medievalFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, theCamera.viewportHeight - 10);
         game.monoFont.draw(game.batch, "Average: " + average, 50, theCamera.viewportHeight - 40);
-        this.arrowKeyFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", 50, 50);
-        this.arrowKeyFont.draw(game.batch, "ESC to exit or Press R to reset", 30, 20);
-        game.batch.end();
 
-        game.batch.begin();
+        this.arrowKeyFont.setColor(Color.MAGENTA);
+
+        game.medievalFont.setColor(1, 1, 0, 0.7f);
+        game.medievalFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", theCamera.viewportWidth / 2-350, 50);
+        game.medievalFont.draw(game.batch, "Press R to Reset", theCamera.viewportWidth-250, 75);
+
+        game.medievalFont.draw(game.batch, "ESC to exit", 0, 75);
+
         this.arrowKeyFont.draw(game.batch, "Rows: " + rows, 50, theCamera.viewportHeight - 70);
         this.arrowKeyFont.draw(game.batch, "Columns: " + columns, 50, theCamera.viewportHeight - 90);
         game.batch.end();
@@ -201,11 +202,7 @@ public class BoardScreen implements Screen
 
         if (anInput.isKeyPressed(Input.Keys.ESCAPE))
         {
-            //ScreenUtils.clear(0, 0, 02.f, 1);
-            adventureMusic.stop();
             changeScreens();
-            //this.game.setScreen(new MenuScreen(game));
-            //hide();
         }
 
         if (stateOfGame == State.RUN)
@@ -225,7 +222,7 @@ public class BoardScreen implements Screen
         if (findCollisions() && stateOfGame == State.RUN)
         {
             stateOfGame = State.STOPPED;
-            adventureMusic.stop();
+            aBoardController.getAdventureMusic().stop();
             totalTimesRan++;
             totalMovements += aBoardController.totalPlayerMovements;
             average = totalMovements / totalTimesRan;
@@ -243,8 +240,6 @@ public class BoardScreen implements Screen
             public void changed(ChangeEvent event, Actor actor)
             {
                 resetBoard();
-                //resetButton.setChecked(true);
-                //event.cancel();
             }
         });
 
@@ -258,13 +253,14 @@ public class BoardScreen implements Screen
         });
     }
 
+    /**
+     * This will change the current screen back to the previous screen.
+     */
     private void changeScreens()
     {
         stateOfGame = State.STOPPED;
         aBoardController.getAdventureMusic().stop();
-        //this.dispose();
         this.game.setScreen(aScreen);
-        //this.game.setScreen(aScreen);
     }
 
     @Override
@@ -303,7 +299,6 @@ public class BoardScreen implements Screen
     @Override
     public void hide()
     {
-        adventureMusic.stop();
     }
 
     /**
@@ -314,10 +309,8 @@ public class BoardScreen implements Screen
     {
         aShape.dispose();
         aScreen.dispose();
-        adventureMusic.dispose();
         uiStage.dispose();
 
-        //game.dispose();
     }
 }
 

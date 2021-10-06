@@ -106,7 +106,7 @@ public class BoardController
             Player aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, "Meow");
             aPlayers[currentPlayersAdded] = aPlayer;
             //playerBoard.boardArray[yArrayLocation][xArrayLocation] = aPlayer;
-            tileBoard.getPiecesArray()[yArrayLocation][xArrayLocation].addPiece(aPlayer);
+            //tileBoard.getPiecesArray()[yArrayLocation][xArrayLocation].addPiece(aPlayer); Might use this later
             currentPlayersAdded++;
 
             //SouthEast Corner
@@ -137,7 +137,7 @@ public class BoardController
      */
     public boolean playerConflict()
     {
-        boolean answer = false;
+        boolean answer;
         Player firstPlayer = aPlayers[0];
 
         for (int i = 1; i < aPlayers.length; i++)
@@ -282,14 +282,14 @@ public class BoardController
                 int oldXArrayLocation = somePlayer.xArrayLocation;
                 int oldYArrayLocation = somePlayer.yArrayLocation;
                 boolean playerMoved = somePlayer.playerMovement(numberOfRows, numberOfColumns);
-                if (playerMoved)
+                /*if (playerMoved)
                 {
                     //playerBoard.boardArray[somePlayer.yArrayLocation][somePlayer.xArrayLocation] = somePlayer;
                     //playerBoard.boardArray[oldYArrayLocation][oldXArrayLocation] = null;
                     tileBoard.getPiecesArray()[oldYArrayLocation][oldXArrayLocation].removePiece(somePlayer);
                     tileBoard.getPiecesArray()[somePlayer.yArrayLocation][somePlayer.xArrayLocation].addPiece(somePlayer);
                 }
-                assert somePlayer.yArrayLocation < numberOfRows;
+                assert somePlayer.yArrayLocation < numberOfRows;*/
             }
             totalPlayerMovements++;
             playerMovementTimer = 0;
