@@ -2,6 +2,8 @@ package com.woods.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,6 +28,9 @@ public class Woods extends Game
     Array<Texture> backgroundTextures;
     HashMap<String, Texture> menuTextures;
     Texture[] boardTextures;
+    Music forestMusic;
+    Music scaryMusic;
+    Sound found;
 
     /**
      * Basic creation method
@@ -46,6 +51,9 @@ public class Woods extends Game
         aLabelStyle.font = new BitmapFont(Gdx.files.internal("monofnt.fnt"));
         img = new Texture("badlogic.jpg");
         this.monoFont = new BitmapFont(Gdx.files.internal("monofnt.fnt"));
+        this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
+        this.scaryMusic = Gdx.audio.newMusic(Gdx.files.internal("scary.mp3"));
+        this.found = Gdx.audio.newSound(Gdx.files.internal("found.wav"));
         this.setScreen(new MenuScreen(this));
 
     }
@@ -68,6 +76,15 @@ public class Woods extends Game
         {
             aTexture.dispose();
         }
+        forestMusic.dispose();
+        monoFont.dispose();
+        medievalFont.dispose();
+        for (int i = 0; i < boardTextures.length; i++)
+        {
+            boardTextures[i].dispose();
+        }
+        found.dispose();
+
     }
 
     private void addTextures()
@@ -82,29 +99,17 @@ public class Woods extends Game
         menuTextures.put("SlantedTree", slantedTree);
         menuTextures.put("DeadTree", deadTree);
 
-        Texture tree1 = new Texture(Gdx.files.internal("Tree_Pine_00.png"));
-        Texture tree2 = new Texture(Gdx.files.internal("Tree_Pine_01.png"));
-        Texture tree3 = new Texture(Gdx.files.internal("Tree_Pine_02.png"));
-        Texture tree4 = new Texture(Gdx.files.internal("Tree_Pine_03.png"));
-        Texture tree5 = new Texture(Gdx.files.internal("Tree_Pine_04.png"));
-        Texture tree6 = new Texture(Gdx.files.internal("Tree_Pine_Snow_00.png"));
-        Texture tree7 = new Texture(Gdx.files.internal("Tree_Pine_Snow_01.png"));
-        Texture tree8 = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"));
-        Texture tree9 = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"));
-        Texture tree10 = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"));
-
-        boardTextures[0] = tree1;
-        boardTextures[1] = tree2;
-        boardTextures[2] = tree3;
-        boardTextures[3] = tree4;
-        boardTextures[4] = tree5;
-        boardTextures[5] = tree6;
-        boardTextures[6] = tree7;
-        boardTextures[7] = tree8;
-        boardTextures[8] = tree9;
-        boardTextures[9] = tree10;
+        boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"));
+        boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"));
+        boardTextures[2] = new Texture(Gdx.files.internal("Tree_Pine_02.png"));
+        boardTextures[3] = new Texture(Gdx.files.internal("Tree_Pine_03.png"));
+        boardTextures[4] = new Texture(Gdx.files.internal("Tree_Pine_04.png"));
+        boardTextures[5] = new Texture(Gdx.files.internal("Tree_Pine_Snow_00.png"));
+        boardTextures[6] = new Texture(Gdx.files.internal("Tree_Pine_Snow_01.png"));
+        boardTextures[7] = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"));
+        boardTextures[8] = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"));
+        boardTextures[9] = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"));
 
         Texture blueTile = new Texture(Gdx.files.internal("blueTile.png"));
-
     }
 }

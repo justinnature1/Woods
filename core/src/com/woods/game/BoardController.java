@@ -56,7 +56,7 @@ public class BoardController
         this.numberOfPlayers = numberOfPlayers;
         this.aPlayers = new Player[numberOfPlayers];
         this.totalPlayerMovements = 0;
-        this.playerUpdateTime = .3f; //Will update player movement every 3 seconds of game delta time
+        this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
     }
 
@@ -101,6 +101,7 @@ public class BoardController
         int xArrayLocation = 0;
         int yArrayLocation = 0;
 
+        //TODO Should fix the following loop, just use a simple equation to put players in corners instead
         //This default player creation will create players starting at the Northwest corner
         while (currentPlayersAdded < this.numberOfPlayers)
         {
@@ -274,9 +275,9 @@ public class BoardController
      */
     public void updatePlayers()
     {
-        playerMovementTimer += Gdx.graphics.getDeltaTime();
+        playerMovementTimer += Gdx.graphics.getDeltaTime(); //Gets the time from last render
 
-        if (playerMovementTimer >= playerUpdateTime) //Updates movement every 3 seconds
+        if (playerMovementTimer >= playerUpdateTime) //Updates movement every .3 seconds
         {
             for (Player somePlayer : aPlayers)
             {

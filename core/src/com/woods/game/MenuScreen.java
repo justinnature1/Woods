@@ -3,6 +3,8 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -56,6 +58,7 @@ public class MenuScreen implements Screen
     Texture exitTexture;
     Background raindropsBackground;
     ImageButton imageButtonOfTree;
+    Music forestMusic;
 
 
     final float WORLD_WIDTH = 100;
@@ -64,7 +67,9 @@ public class MenuScreen implements Screen
 
     public MenuScreen(Woods aGame)
     {
+        this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
 
+        this.forestMusic.setLooping(true);
         this.aFont = new BitmapFont();
         this.aBatch = new SpriteBatch();
         this.aGame = aGame;
@@ -127,6 +132,10 @@ public class MenuScreen implements Screen
     public void show()
     {
         Gdx.input.setInputProcessor(someStage);
+        aGame.forestMusic.play();
+        aGame.forestMusic.setVolume(0.1f);
+        createListeners();
+
     }
 
     private void createButtons()
@@ -242,8 +251,6 @@ public class MenuScreen implements Screen
         someStage.addActor(exitButton);
         someStage.addActor(rootTable);
         someStage.setViewport(aViewport);
-
-        createListeners();
     }
 
     /**
@@ -314,6 +321,7 @@ public class MenuScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
+                aGame.forestMusic.stop();
                 aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
             }
         });
@@ -376,7 +384,7 @@ public class MenuScreen implements Screen
     @Override
     public void pause()
     {
-
+        aGame.forestMusic.play();
     }
 
     @Override
@@ -388,12 +396,14 @@ public class MenuScreen implements Screen
     @Override
     public void hide()
     {
-
+        aGame.forestMusic.stop();
     }
 
     @Override
     public void dispose()
     {
         fruitAtlas.dispose();
+        forestMusic.dispose();
+        aGame.forestMusic.stop();
     }
 }

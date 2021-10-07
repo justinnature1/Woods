@@ -14,13 +14,13 @@ import java.util.Random;
  */
 public class Background
 {
+    //TODO Change this class to use a Board data structure to determine dimensions of a background
     Animations backgroundAnim;
     int rows, columns;
     Array<Texture> someTextures;
     Camera aCamera;
     float width, height;
 
-    //TODO Calculate size of rows and columns
 
     public Background(Array<Texture> someTextures, int size, float frameDuration, Camera aCamera, int rows, int columns)
     {
@@ -70,12 +70,16 @@ public class Background
         height = aCamera.viewportHeight / rows;
     }
 
+    /**
+     * Determines the size of the background animation. Rows and Columns determines how often it should be drawn. Could also just use a Board class to determine
+     * dimensions.
+     */
     private void getDimensionsTwo()
     {
         width = backgroundAnim.anAnimation.getKeyFrame(0.1f).getRegionWidth();
         height = backgroundAnim.anAnimation.getKeyFrame(0.1f).getRegionHeight();
-        columns = Math.round(aCamera.viewportWidth / width);
-        rows = Math.round(aCamera.viewportHeight / height);
+        columns = Math.round(aCamera.viewportWidth / width) + 1;
+        rows = Math.round(aCamera.viewportHeight / height) + 1;
     }
 
 

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -68,7 +69,6 @@ public class BoardScreen implements Screen
 
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
 
-
         this.aScreen = aScreen;
         this.game = aGame;
         this.rows = rows;
@@ -77,9 +77,6 @@ public class BoardScreen implements Screen
         theCamera = aScreen.camera;
         aViewport = aScreen.aViewport;
         this.uiStage = new Stage(aViewport);
-
-        Gdx.input.setInputProcessor(uiStage); //Without this, buttons and etc will not have their event listeners activated
-
 
         theCamera.setToOrtho(false);
 
@@ -129,13 +126,33 @@ public class BoardScreen implements Screen
     }
 
     /**
-     * Anything in this method will automatically start when this object screen opens
+     * Anything in this method will automatically start when this object screen opens.
+     * Must put listeners for buttons/etc in here otherwise there will be processing delays.
+     * DO NOT PUT Listeners in render()
      */
     @Override
     public void show()
     {
-        //adventureMusic.play();
-        aBoardController.getAdventureMusic().play();
+        Gdx.input.setInputProcessor(uiStage); //Without this, buttons and etc will not have their event listeners activated
+        game.scaryMusic.play();
+        game.scaryMusic.setVolume(0.1f);
+        resetButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                resetBoard();
+            }
+        });
+
+        exitButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                changeScreens();
+            }
+        });
     }
 
     /**
@@ -153,6 +170,7 @@ public class BoardScreen implements Screen
     public void render(float delta)
     {
         ScreenUtils.clear(0, 0, 0.2f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //theCamera.update();
         aShape.setProjectionMatrix(theCamera.combined);
@@ -175,8 +193,8 @@ public class BoardScreen implements Screen
         this.arrowKeyFont.setColor(Color.MAGENTA);
 
         game.medievalFont.setColor(1, 1, 0, 0.7f);
-        game.medievalFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", theCamera.viewportWidth / 2-350, 50);
-        game.medievalFont.draw(game.batch, "Press R to Reset", theCamera.viewportWidth-250, 75);
+        game.medievalFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", theCamera.viewportWidth / 2 - 350, 50);
+        game.medievalFont.draw(game.batch, "Press R to Reset", theCamera.viewportWidth - 250, 75);
 
         game.medievalFont.draw(game.batch, "ESC to exit", 0, 75);
 
@@ -197,7 +215,9 @@ public class BoardScreen implements Screen
                 stateOfGame = State.RUN;
             }
         }
+
         update();
+
     }
 
     /**
@@ -223,14 +243,15 @@ public class BoardScreen implements Screen
             {
                 aBoardController.decreaseSpeed();
             }
-            aBoardController.getAdventureMusic().play();
             aBoardController.updatePlayers();
+            this.resume();
         }
 
         if (findCollisions() && stateOfGame == State.RUN)
         {
+            game.found.play();
             stateOfGame = State.STOPPED;
-            aBoardController.getAdventureMusic().stop();
+            this.pause();
             totalTimesRan++;
             totalMovements += aBoardController.totalPlayerMovements;
             average = totalMovements / totalTimesRan;
@@ -241,24 +262,6 @@ public class BoardScreen implements Screen
         {
             resetBoard();
         }
-
-        resetButton.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                resetBoard();
-            }
-        });
-
-        exitButton.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                changeScreens();
-            }
-        });
     }
 
     /**
@@ -267,7 +270,6 @@ public class BoardScreen implements Screen
     private void changeScreens()
     {
         stateOfGame = State.STOPPED;
-        aBoardController.getAdventureMusic().stop();
         this.game.setScreen(aScreen);
     }
 
@@ -289,24 +291,26 @@ public class BoardScreen implements Screen
         stateOfGame = State.RUN;
         aBoardController.totalPlayerMovements = 0;
         aBoardController.playerUpdateTime = 0.3f;
-        aBoardController.getAdventureMusic().stop();
+        this.pause();
+
     }
 
     @Override
     public void pause()
     {
-
+        game.scaryMusic.pause();
     }
 
     @Override
     public void resume()
     {
-
+        game.scaryMusic.play();
     }
 
     @Override
     public void hide()
     {
+        game.scaryMusic.stop();
     }
 
     /**
@@ -318,7 +322,8 @@ public class BoardScreen implements Screen
         aShape.dispose();
         aScreen.dispose();
         uiStage.dispose();
-
+        exitTexture.dispose();
+        game.dispose();
     }
 }
 
