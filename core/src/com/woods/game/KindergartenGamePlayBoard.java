@@ -3,31 +3,27 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.*;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
+import javax.tools.Diagnostic;
+//TODO Add graphical characters to the Players class to be drawn
 
 /**
- * This will implement a 'Board screen' for the actual gameplay
+ * This class will implement the Kindergarten gameplay for the screen
  */
-public class BoardScreen implements Screen
+public class KindergartenGamePlayBoard implements Screen
 {
+
     /**
      * This will help set the 'state' of the game. Whether it is running or paused or etc.
      */
@@ -40,9 +36,6 @@ public class BoardScreen implements Screen
         FOUND
     }
 
-    OrthographicCamera theCamera;
-    Viewport aViewport;
-    //Board aBoard;
     BoardController aBoardController;
     Woods game;
     ShapeRenderer aShape;
@@ -51,22 +44,17 @@ public class BoardScreen implements Screen
     Screen aScreen;
     State stateOfGame;
     Stage uiStage;
+    Camera theCamera;
+    Viewport aViewport;
 
     Button resetButton;
     Button exitButton;
-    float totalTimesRan, totalMovements, average;
 
-    statistics statisticsFunc;
     found foundFunc;
+    statistics statisticsFunc;
 
-    BitmapFont arrowKeyFont;
-
-    public BoardScreen(final Woods aGame, MenuScreen aScreen, final int rows, final int columns)
+    public KindergartenGamePlayBoard(final Woods aGame, MenuScreen aScreen, final int rows, final int columns)
     {
-
-
-        this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
-
         this.aScreen = aScreen;
         this.game = aGame;
         this.rows = rows;
@@ -76,17 +64,14 @@ public class BoardScreen implements Screen
         aViewport = aScreen.aViewport;
         this.uiStage = new Stage(aViewport);
 
-        theCamera.setToOrtho(false);
-
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
-        aBoardController = new BoardController(aGame, rows, columns, (theCamera.viewportWidth - rightSideBuffer) / columns, (theCamera.viewportHeight - bottomEdgeBuffer) / rows, 4);
-
+        aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, 4);
         aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);
-
         stateOfGame = State.RUN;
         resetButton = game.buttons.get("reset");
         exitButton = game.buttons.get("exit");
@@ -108,18 +93,24 @@ public class BoardScreen implements Screen
             @Override
             public void drawStatistics(SpriteBatch aBatch)
             {
-                game.monoFont.setColor(1, 1, 0, 1.3f);
-                game.medievalFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, game.camera.viewportHeight - 10);
-                game.monoFont.draw(game.batch, "Average: " + average, 50, game.camera.viewportHeight - 40);
-                game.arrowKeyFont.draw(game.batch, "Rows: " + rows, 50, game.camera.viewportHeight - 70);
-                game.arrowKeyFont.draw(game.batch, "Columns: " + columns, 50, game.camera.viewportHeight - 90);
+
+                game.largeFont.setColor(Color.YELLOW.r, Color.YELLOW.g, Color.YELLOW.b, 1);
+
+
+                game.largeFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements,
+                        1 * aBoardController.pixelBlockWidth, 9 * aBoardController.pixelBlockHeight);
+                //TODO Make a larger font for rows/columns
+                game.arrowKeyFont.draw(game.batch, "Rows: " + rows, 1 * aBoardController.pixelBlockWidth, 8.5f * aBoardController.pixelBlockHeight);
+                game.arrowKeyFont.draw(game.batch, "Columns: " + columns, 1 * aBoardController.pixelBlockWidth, 8 * aBoardController.pixelBlockHeight);
+
             }
         };
+
     }
 
     /**
      * Anything in this method will automatically start when this object screen opens.
-     * Must put listeners for buttons/etc in here otherwise there will be processing delays.
+     * MUST put listeners for buttons/etc in here otherwise there will be processing delays.
      * DO NOT PUT Listeners in render()
      */
     @Override
@@ -147,17 +138,6 @@ public class BoardScreen implements Screen
         });
     }
 
-    /**
-     * Finds collisions among the players
-     *
-     * @return boolean
-     */
-    public boolean findCollisions()
-    {
-        return aBoardController.playerConflict();
-    }
-
-
     @Override
     public void render(float delta)
     {
@@ -165,7 +145,7 @@ public class BoardScreen implements Screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //theCamera.update();
-        aShape.setProjectionMatrix(theCamera.combined);
+        aShape.setProjectionMatrix(game.camera.combined);
 
         //Next few lines Draws Players and rectangles on board
         aShape.begin(ShapeRenderer.ShapeType.Line);
@@ -176,9 +156,8 @@ public class BoardScreen implements Screen
         aShape.end();
 
         game.batch.begin();
-        aBoardController.drawBoard(game.batch); //Draws textures on board
+        aBoardController.drawBoard(game.batch);
         aBoardController.drawDirections();
-        this.arrowKeyFont.setColor(Color.MAGENTA);
         aBoardController.drawStatistics(statisticsFunc);
         game.batch.end();
 
@@ -207,6 +186,40 @@ public class BoardScreen implements Screen
             game.batch.end();
         }
 
+    }
+
+    @Override
+    public void resize(int width, int height)
+    {
+        game.aViewport.update(width, height);
+        uiStage.getViewport().update(width, height);
+    }
+
+    @Override
+    public void pause()
+    {
+        game.scaryMusic.pause();
+    }
+
+    @Override
+    public void resume()
+    {
+        game.scaryMusic.play();
+    }
+
+    @Override
+    public void hide()
+    {
+        game.scaryMusic.stop();
+    }
+
+    @Override
+    public void dispose()
+    {
+        aShape.dispose();
+        aScreen.dispose();
+        uiStage.dispose();
+        game.dispose();
     }
 
     /**
@@ -239,13 +252,8 @@ public class BoardScreen implements Screen
         if (findCollisions() && stateOfGame == State.RUN)
         {
             game.found.play();
-            //stateOfGame = State.STOPPED;
             stateOfGame = State.FOUND;
             this.pause();
-            totalTimesRan++;
-            totalMovements += aBoardController.totalPlayerMovements; //Adds all the player movements so far in the game
-            average = totalMovements / totalTimesRan;
-            aBoardController.setAverage(average);
             //aBoardController.fade(aShape);
         }
 
@@ -253,6 +261,19 @@ public class BoardScreen implements Screen
         {
             resetBoard();
         }
+    }
+
+    /**
+     * Resets the board and player location to defaults
+     */
+    private void resetBoard()
+    {
+        //aBoardController.createArrayOfTextures(game.boardTextures);
+        aBoardController.createPlayersDefaultLocation();
+        stateOfGame = State.RUN;
+        aBoardController.totalPlayerMovements = 0;
+        aBoardController.playerUpdateTime = 0.3f;
+        this.pause();
     }
 
     /**
@@ -264,56 +285,13 @@ public class BoardScreen implements Screen
         this.game.setScreen(aScreen);
     }
 
-    @Override
-    public void resize(int width, int height)
-    {
-        aViewport.update(width, height);
-        uiStage.getViewport().update(width, height);
-    }
-
     /**
-     * Resets the board and player location to defaults
+     * Finds collisions among the players
+     *
+     * @return boolean
      */
-    private void resetBoard()
+    public boolean findCollisions()
     {
-
-        //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.createPlayersDefaultLocation();
-        stateOfGame = State.RUN;
-        aBoardController.totalPlayerMovements = 0;
-        aBoardController.playerUpdateTime = 0.3f;
-        this.pause();
-
-    }
-
-    @Override
-    public void pause()
-    {
-        game.scaryMusic.pause();
-    }
-
-    @Override
-    public void resume()
-    {
-        game.scaryMusic.play();
-    }
-
-    @Override
-    public void hide()
-    {
-        game.scaryMusic.stop();
-    }
-
-    /**
-     * Must dispose of game objects when finished, otherwise they can linger in the background
-     */
-    @Override
-    public void dispose()
-    {
-        aShape.dispose();
-        aScreen.dispose();
-        uiStage.dispose();
-        game.dispose();
-
+        return aBoardController.playerConflict();
     }
 }

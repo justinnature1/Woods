@@ -20,6 +20,7 @@ import java.util.Set;
 public class BoardController
 {
 
+    Woods game;
     BoardOfPieces tileBoard;
     Board playerBoard;
     int numberOfRows;
@@ -30,13 +31,15 @@ public class BoardController
     Player[] aPlayers;
     String[] playerNames = {"Joel", "Chris", "Mary", "Lyra"};
     int totalPlayerMovements;
+    float average;
 
     Music adventureMusic;
 
     float playerUpdateTime;
     float playerMovementTimer;
 
-    public BoardController(int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers)
+
+    public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers)
     {
         /*if (numberOfRows < 5 || numberOfColumns < 5)
         {
@@ -46,7 +49,7 @@ public class BoardController
         {
             throw new IllegalArgumentException("Number of players must be above 1");
         }*/
-
+        this.game = aGame;
         this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.numberOfRows = numberOfRows;
@@ -154,6 +157,25 @@ public class BoardController
         return false;
     }
 
+    public void drawCollision(found foundFunction)
+    {
+        foundFunction.drawCollision(game.batch);
+    }
+
+    public void drawStatistics(statistics aStatFunction)
+    {
+        aStatFunction.drawStatistics(game.batch);
+    }
+
+    public void drawDirections()
+    {
+        game.medievalFont.setColor(1, 1, 0, 1f);
+        game.medievalFont.draw(game.batch, "Press Left to slow or Right Arrow increase speed", game.camera.viewportWidth / 2 - 350, 50);
+        game.medievalFont.draw(game.batch, "Press R to Reset", game.camera.viewportWidth - 250, 75);
+
+        game.medievalFont.draw(game.batch, "ESC to exit", 0, 75);
+    }
+
     /**
      * Creates an array of GraphicsTiles objects. Using the i and j values in the loops for x/y tile location
      */
@@ -190,7 +212,7 @@ public class BoardController
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
                 arrayTextureIndex = aRan.nextInt(10);
-                aTexture = textureArray[arrayTextureIndex]; //Too many different textures will slow down HTML build, GWT is slow
+                aTexture = textureArray[arrayTextureIndex]; //Too many different textures on large super large boards will slow down HTML build, GWT is slow
 
                 aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
                 aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
@@ -217,6 +239,11 @@ public class BoardController
         }
     }
 
+    /**
+     * Draws each individual Piece on the board using the Pieces data structure.
+     * Must be used between a SpriteBatch.Begin() and SpriteBatch.End()
+     * @param aBatch SpriteBatch
+     */
     public void drawBoard(SpriteBatch aBatch)
     {
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
@@ -231,6 +258,11 @@ public class BoardController
         }
     }
 
+    /**
+     * Draws each player that is located in the Players ArrayList
+     * MUST be used between Sprit
+     * @param renderer
+     */
     public void drawPlayers(ShapeRenderer renderer)
     {
         for (Player somePlayer : aPlayers)
@@ -270,6 +302,16 @@ public class BoardController
         return adventureMusic;
     }
 
+    public float getAverage()
+    {
+        return average;
+    }
+
+    public void setAverage(float average)
+    {
+        this.average = average;
+    }
+
     /**
      * Updates location of players per game delta time
      */
@@ -297,4 +339,14 @@ public class BoardController
             playerMovementTimer = 0;
         }
     }
+}
+
+interface found
+{
+    void drawCollision(SpriteBatch aBatch);
+}
+
+interface statistics
+{
+    void drawStatistics(SpriteBatch aBatch);
 }

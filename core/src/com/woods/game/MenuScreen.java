@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -38,8 +39,6 @@ public class MenuScreen implements Screen
     Texture lightningTexture;
     Texture rainTextureOne;
     Texture rainTextureTwo;
-    TextureAtlas fruitAtlas;
-    Sprite bananaSprite;
     Animation<TextureRegion> lightningAnimation;
     float animationStatetime;
     TextField rowTextField;
@@ -57,13 +56,8 @@ public class MenuScreen implements Screen
     Button.ButtonStyle buttonStyle;
     Texture exitTexture;
     Background raindropsBackground;
-    ImageButton imageButtonOfTree;
+    ImageButton imageButtonOfTree, imageOfBunny;
     Music forestMusic;
-
-
-    final float WORLD_WIDTH = 100;
-    final float WORLD_HEIGHT = 100;
-
 
     public MenuScreen(Woods aGame)
     {
@@ -74,12 +68,14 @@ public class MenuScreen implements Screen
         this.aBatch = new SpriteBatch();
         this.aGame = aGame;
         this.aShape = new ShapeRenderer();
-        this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
+        this.camera = aGame.camera;
         this.rootTable = new Table();
         camera.setToOrtho(false);
         //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-        aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
+        aViewport = aGame.aViewport;
         aViewport.apply();
+        aBoard = new Board(50, 50, camera.viewportWidth / 50,
+                camera.viewportHeight / 50);
         //aViewport.setScreenPosition(10, 10);
 
         someStage = new Stage(aViewport);
@@ -90,8 +86,6 @@ public class MenuScreen implements Screen
         rainTextureOne = new Texture(Gdx.files.internal("rain-0.png"));
         rainTextureTwo = new Texture(Gdx.files.internal("rain-1.png"));
 
-        fruitAtlas = new TextureAtlas("fruit.txt");
-        bananaSprite = fruitAtlas.createSprite("banana");
         animationStatetime = 0f;
 
         ArrayList<Texture> someTextures = new ArrayList<>();
@@ -177,8 +171,8 @@ public class MenuScreen implements Screen
         Texture slantedTreeTexture = aGame.menuTextures.get("SlantedTree");
         Image slantedTreeImage = new Image(slantedTreeTexture);
         slantedTreeImage.setSize(300, 300);
-        slantedTreeImage.setX(camera.viewportWidth-400);
-        slantedTreeImage.setY(camera.viewportHeight-450);
+        slantedTreeImage.setX(camera.viewportWidth - 400);
+        slantedTreeImage.setY(camera.viewportHeight - 450);
 
 
         someSkin.add("default", textButtonStyle);
@@ -204,47 +198,62 @@ public class MenuScreen implements Screen
 
         Label rowLabel = new Label("Rows: ", someSkin);
         Label colLabel = new Label("Columns:  ", someSkin);
+        Label kinderGartenLabel = new Label("K-2", someSkin);
+        kinderGartenLabel.setPosition(10 * aBoard.blockPixelWidth, 5 * aBoard.blockPixelHeight);
         Label welcome = new Label("Welcome to Wandering Woods", someSkin);
         Label clickToBegin = new Label("Click Tree to begin", someSkin);
+        Label cleanUI = new Label("This UI will be cleaned and re-positioned soon", someSkin);
+        cleanUI.setPosition(5 * aBoard.blockPixelWidth, 45 * aBoard.blockPixelHeight);
 
         Texture treeTexture = aGame.menuTextures.get("DeadTree");
         TextureRegion treeRegion = new TextureRegion(treeTexture);
         ImageButton.ImageButtonStyle imageStyle = new ImageButton.ImageButtonStyle();
         Image treeImage = new Image(treeRegion);
         treeImage.setSize(400, 400);
-        treeImage.setY(camera.viewportHeight-500);
+        treeImage.setY(camera.viewportHeight - 500);
         someSkin.add("tree", treeRegion);
         imageStyle.up = new TextureRegionDrawable(treeRegion);
         imageStyle.over = someSkin.newDrawable("tree", Color.RED);
-        ImageButton imageButtonOfTree = new ImageButton(imageStyle);
+        imageButtonOfTree = new ImageButton(imageStyle);
 
-        imageButtonOfTree.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
-            }
-        });
+        //Placing button data in Main Game will lead to a LARGE slowdown
+        ImageButton.ImageButtonStyle gradeButtonStyle = new ImageButton.ImageButtonStyle();
+        TextureRegion bunnyRegion = new TextureRegion(aGame.menuTextures.get("SleepingBunny"));
+        someSkin.add("bunny", bunnyRegion);
+        gradeButtonStyle.up = new TextureRegionDrawable(bunnyRegion);
+        gradeButtonStyle.over = someSkin.newDrawable("bunny", Color.CORAL);
+        imageOfBunny = new ImageButton(gradeButtonStyle);
 
-        rootTable = new Table();
-        rootTable.setY(camera.viewportHeight / 2);
-        rootTable.setX(camera.viewportWidth / 2);
-        rootTable.row().padBottom(100);
 
-        rootTable.add(welcome).width(30).padRight(200);
-        rootTable.row(); //Adds a new row
-        rootTable.add(rowLabel);
-        rootTable.add(rowTextField);
-        rootTable.row();
-        rootTable.add(colLabel);
-        rootTable.add(colTextField);
-        rootTable.row();
-        rootTable.add(imageButtonOfTree).size(100, 100);
-        rootTable.add(clickToBegin);
         exitButton.setWidth((float) exitTexture.getWidth() / 4);
         exitButton.setHeight((float) exitTexture.getHeight() / 4);
 
+        rootTable = new Table();
+        rootTable.setFillParent(true);
+        Table someTable = new Table();
+        someTable.add(welcome);
+        someTable.setFillParent(true);
+
+        rootTable.add(welcome).fill().padBottom(100);
+        rootTable.row().align(0);
+        rootTable.add(rowLabel);
+        rootTable.add(rowTextField);
+        rootTable.row(); //Adds new row
+        rootTable.add(colLabel);
+        rootTable.add(colTextField);
+        rootTable.row(); //Adds new row
+        rootTable.add(imageButtonOfTree).size(100, 100);
+        rootTable.add(clickToBegin);
+
+        //sleepingBunny = aGame.imageButtons.get("SleepingBunny");
+        imageOfBunny.setX(5 * aBoard.blockPixelWidth);
+        imageOfBunny.setY(8 * aBoard.blockPixelHeight);
+        imageOfBunny.setSize(300, 200);
+
+
+        someStage.addActor(cleanUI);
+        someStage.addActor(imageOfBunny);
+        someStage.addActor(kinderGartenLabel);
         someStage.addActor(slantedTreeImage);
         someStage.addActor(treeImage);
         someStage.addActor(rootTable);
@@ -258,9 +267,6 @@ public class MenuScreen implements Screen
      */
     private void addVisualTextures()
     {
-
-        rootTable.row();
-        rootTable.add(imageButtonOfTree).size(100, 100);
 
         //someStage.addActor(treeImage);
     }
@@ -336,6 +342,24 @@ public class MenuScreen implements Screen
             }
         });
 
+        imageButtonOfTree.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
+            }
+        });
+
+        imageOfBunny.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                aGame.setScreen(new KindergartenGamePlayBoard(aGame, new MenuScreen(aGame), rows, columns));
+            }
+        });
+
 
     }
 
@@ -402,8 +426,8 @@ public class MenuScreen implements Screen
     @Override
     public void dispose()
     {
-        fruitAtlas.dispose();
         forestMusic.dispose();
         aGame.forestMusic.stop();
+        aGame.dispose();
     }
 }
