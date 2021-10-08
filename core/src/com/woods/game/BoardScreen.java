@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.*;
 
-
+//TODO Make Screen Controller
 /**
  * This will implement a 'Board screen' for the actual gameplay
  */
@@ -76,13 +76,12 @@ public class BoardScreen implements Screen
         aViewport = aScreen.aViewport;
         this.uiStage = new Stage(aViewport);
 
-        theCamera.setToOrtho(false);
-
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
-        aBoardController = new BoardController(aGame, rows, columns, (theCamera.viewportWidth - rightSideBuffer) / columns, (theCamera.viewportHeight - bottomEdgeBuffer) / rows, 4);
+        aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, 4);
 
         aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);
@@ -165,7 +164,7 @@ public class BoardScreen implements Screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //theCamera.update();
-        aShape.setProjectionMatrix(theCamera.combined);
+        aShape.setProjectionMatrix(game.camera.combined);
 
         //Next few lines Draws Players and rectangles on board
         aShape.begin(ShapeRenderer.ShapeType.Line);
@@ -267,7 +266,7 @@ public class BoardScreen implements Screen
     @Override
     public void resize(int width, int height)
     {
-        aViewport.update(width, height);
+        game.aViewport.update(width, height);
         uiStage.getViewport().update(width, height);
     }
 
