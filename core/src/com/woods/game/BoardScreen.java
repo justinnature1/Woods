@@ -9,9 +9,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -55,6 +57,8 @@ public class BoardScreen implements Screen
     Button resetButton;
     Button exitButton;
     float totalTimesRan, totalMovements, average;
+    Sprite aSprite;
+    Skin someSkin;
 
     statistics statisticsFunc;
     found foundFunc;
@@ -75,6 +79,7 @@ public class BoardScreen implements Screen
         theCamera = aScreen.camera;
         aViewport = aScreen.aViewport;
         this.uiStage = new Stage(aViewport);
+        someSkin = new Skin();
 
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
@@ -86,9 +91,20 @@ public class BoardScreen implements Screen
         aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);
 
+        Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
+        Texture exitTexture = game.menuTextures.get("Exit");
+        someSkin.add("exit", exitTexture);
+        TextureRegion exitRegion = new TextureRegion(exitTexture);
+        exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
+        exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
+        exitButton = new Button(exitButtonStyle);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
+
         stateOfGame = State.RUN;
         resetButton = game.buttons.get("reset");
-        exitButton = game.buttons.get("exit");
+
         uiStage.addActor(resetButton);
         uiStage.addActor(exitButton);
 
@@ -144,6 +160,8 @@ public class BoardScreen implements Screen
                 changeScreens();
             }
         });
+
+
     }
 
     /**
@@ -251,6 +269,15 @@ public class BoardScreen implements Screen
         if (anInput.isKeyPressed(Input.Keys.R))
         {
             resetBoard();
+        }
+
+        if (anInput.isTouched())
+        {
+            //game.medievalFont.draw(game.batch, "hellos", 400, 400);
+            System.out.println("meow");
+            System.out.println(aViewport.unproject(new Vector2((anInput.getX()), anInput.getY())));
+            /*sprite.setPosition(Gdx.input.getX() - sprite.getWidth()/2,
+                    Gdx.graphics.getHeight() - Gdx.input.getY() - sprite.getHeight()/2);*/
         }
     }
 

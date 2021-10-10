@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -16,8 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.*;
-
-import java.util.ArrayList;
 
 import static com.badlogic.gdx.Input.*;
 
@@ -27,7 +23,7 @@ import static com.badlogic.gdx.Input.*;
 public class MenuScreen implements Screen
 {
     Stage someStage;
-    Woods aGame;
+    Woods game;
 
     OrthographicCamera camera;
     Viewport aViewport;
@@ -59,20 +55,21 @@ public class MenuScreen implements Screen
     ImageButton imageButtonOfTree, imageOfBunny;
     Music forestMusic;
 
-    public MenuScreen(Woods aGame)
+
+    public MenuScreen(Woods game)
     {
         this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
 
         this.forestMusic.setLooping(true);
         this.aFont = new BitmapFont();
         this.aBatch = new SpriteBatch();
-        this.aGame = aGame;
+        this.game = game;
         this.aShape = new ShapeRenderer();
-        this.camera = aGame.camera;
+        this.camera = game.camera;
         this.rootTable = new Table();
         camera.setToOrtho(false);
         //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-        aViewport = aGame.aViewport;
+        aViewport = game.aViewport;
         aViewport.apply();
         aBoard = new Board(50, 50, camera.viewportWidth / 50,
                 camera.viewportHeight / 50);
@@ -83,16 +80,10 @@ public class MenuScreen implements Screen
         this.columns = 10;
         this.rows = 10;
         lightningTexture = new Texture(Gdx.files.internal("lightning.png"));
-        rainTextureOne = new Texture(Gdx.files.internal("rain-0.png"));
-        rainTextureTwo = new Texture(Gdx.files.internal("rain-1.png"));
 
         animationStatetime = 0f;
 
-        ArrayList<Texture> someTextures = new ArrayList<>();
-        someTextures.add(rainTextureOne);
-        someTextures.add(rainTextureTwo);
-
-        raindropsBackground = new Background(aGame.backgroundTextures, 30, .05f, camera, 4, 4);
+        raindropsBackground = new Background(game.backgroundTextures, 30, .05f, camera, 4, 4);
 
         createButtons();
         createTexture();
@@ -126,8 +117,8 @@ public class MenuScreen implements Screen
     public void show()
     {
         Gdx.input.setInputProcessor(someStage);
-        aGame.forestMusic.play();
-        aGame.forestMusic.setVolume(0.1f);
+        game.forestMusic.play();
+        game.forestMusic.setVolume(0.1f);
         createListeners();
 
     }
@@ -142,17 +133,9 @@ public class MenuScreen implements Screen
         someSkin.add("white", new Texture(pixmap));
         someSkin.add("default", new BitmapFont());
 
-        TextField.TextFieldStyle textFieldStyleThing = new TextField.TextFieldStyle();
-        textFieldStyleThing.background = someSkin.newDrawable("white", Color.DARK_GRAY);
-        textFieldStyleThing.font = aGame.medievalFont;
-        textFieldStyleThing.fontColor = Color.WHITE;
-        textFieldStyleThing.selection = someSkin.newDrawable("white", Color.CORAL);
-        textFieldStyleThing.cursor = someSkin.newDrawable("white", Color.BLACK);
-        textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
-
 
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = aGame.medievalFont;
+        textButtonStyle.font = game.medievalFont;
         textButtonStyle.fontColor = Color.CHARTREUSE;
         textButtonStyle.up = someSkin.newDrawable("white", Color.FIREBRICK);
         textButtonStyle.down = someSkin.newDrawable("white", Color.BLACK);
@@ -160,41 +143,36 @@ public class MenuScreen implements Screen
         textButtonStyle.over = someSkin.newDrawable("white", Color.CYAN);
 
         buttonStyle = new Button.ButtonStyle();
-        exitTexture = new Texture(Gdx.files.internal("exit.png"));
-        TextureRegion exitRegion = new TextureRegion(exitTexture);
-        someSkin.add("red", exitTexture); //Hashmap creation to access texture by the key of 'red'
-        buttonStyle.up = new TextureRegionDrawable(exitRegion);
-        buttonStyle.over = someSkin.newDrawable("red", Color.CYAN);
-        exitButton = new Button(buttonStyle);
-        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
 
-        Texture slantedTreeTexture = aGame.menuTextures.get("SlantedTree");
+        Texture slantedTreeTexture = game.menuTextures.get("SlantedTree");
         Image slantedTreeImage = new Image(slantedTreeTexture);
         slantedTreeImage.setSize(300, 300);
         slantedTreeImage.setX(camera.viewportWidth - 400);
         slantedTreeImage.setY(camera.viewportHeight - 450);
+
+        Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
+        Texture exitTexture = game.menuTextures.get("Exit");
+        someSkin.add("exit", exitTexture);
+        TextureRegion exitRegion = new TextureRegion(exitTexture);
+        exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
+        exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
+        exitButton = new Button(exitButtonStyle);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
 
         someSkin.add("default", textButtonStyle);
 
         startButton = new TextButton("START", textButtonStyle);
 
-        someSkin.add("meow", textFieldStyleThing);
-
         rowStyle = new TextField.TextFieldStyle();
-        rowStyle.font = aGame.medievalFont;
-
-        //someSkin.add("default", rowStyle);
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = aGame.medievalFont;
-        someSkin.add("default", labelStyle);
-
-        rowTextField = new TextField(String.valueOf(rows), textFieldStyleThing);
-        colTextField = new TextField(String.valueOf(columns), textFieldStyleThing);
-        //rowTextField.setSize(2, 2);
-        //rowStyle.background = someSkin.newDrawable();
+        rowStyle.font = game.medievalFont;
         rowStyle.fontColor = Color.WHITE;
-        //rowTextField.setText("Rows");
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = game.medievalFont;
+        someSkin.add("default", labelStyle);
 
         Label rowLabel = new Label("Rows: ", someSkin);
         Label colLabel = new Label("Columns:  ", someSkin);
@@ -205,7 +183,7 @@ public class MenuScreen implements Screen
         Label cleanUI = new Label("This UI will be cleaned and re-positioned soon", someSkin);
         cleanUI.setPosition(5 * aBoard.blockPixelWidth, 45 * aBoard.blockPixelHeight);
 
-        Texture treeTexture = aGame.menuTextures.get("DeadTree");
+        Texture treeTexture = game.menuTextures.get("DeadTree");
         TextureRegion treeRegion = new TextureRegion(treeTexture);
         ImageButton.ImageButtonStyle imageStyle = new ImageButton.ImageButtonStyle();
         Image treeImage = new Image(treeRegion);
@@ -218,21 +196,23 @@ public class MenuScreen implements Screen
 
         //Placing button data in Main Game will lead to a LARGE slowdown
         ImageButton.ImageButtonStyle gradeButtonStyle = new ImageButton.ImageButtonStyle();
-        TextureRegion bunnyRegion = new TextureRegion(aGame.menuTextures.get("SleepingBunny"));
+        TextureRegion bunnyRegion = new TextureRegion(game.menuTextures.get("SleepingBunny"));
         someSkin.add("bunny", bunnyRegion);
         gradeButtonStyle.up = new TextureRegionDrawable(bunnyRegion);
         gradeButtonStyle.over = someSkin.newDrawable("bunny", Color.CORAL);
         imageOfBunny = new ImageButton(gradeButtonStyle);
 
-
-        exitButton.setWidth((float) exitTexture.getWidth() / 4);
-        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        rowTextField = game.textFields.get("Row");
+        rowTextField.setText("2-50");
+        colTextField = game.textFields.get("Col");
+        colTextField.setText("2-50");
 
         rootTable = new Table();
         rootTable.setFillParent(true);
         Table someTable = new Table();
         someTable.add(welcome);
         someTable.setFillParent(true);
+
 
         rootTable.add(welcome).fill().padBottom(100);
         rootTable.row().align(0);
@@ -249,6 +229,8 @@ public class MenuScreen implements Screen
         imageOfBunny.setX(5 * aBoard.blockPixelWidth);
         imageOfBunny.setY(8 * aBoard.blockPixelHeight);
         imageOfBunny.setSize(300, 200);
+
+        exitButton = game.buttons.get("exit");
 
 
         someStage.addActor(cleanUI);
@@ -287,7 +269,11 @@ public class MenuScreen implements Screen
                 {
                     try
                     {
-                        rows = Integer.parseInt(textField.getText());
+                        int tempRows = Integer.parseInt(textField.getText());
+                        if (tempRows >= 2 && tempRows <= 50)
+                        {
+                            rows = tempRows;
+                        }
                         done = true;
                     } catch (Exception e)
                     {
@@ -310,8 +296,16 @@ public class MenuScreen implements Screen
                 {
                     try
                     {
-                        columns = Integer.parseInt(textField.getText());
-                        done = true;
+                        int tempColumns = Integer.parseInt(textField.getText());
+                        if (tempColumns >= 2 && tempColumns <= 50)
+                        {
+                            columns = tempColumns;
+                            done = true;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     } catch (Exception e)
                     {
                         System.err.println(e);
@@ -327,27 +321,20 @@ public class MenuScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                aGame.forestMusic.stop();
-                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
+                game.forestMusic.stop();
+                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns));
             }
         });
 
         //This button will exit the game in the main menu
-        exitButton.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                Gdx.app.exit();
-            }
-        });
+        exitButton.addListener(game.exitScreenListener);
 
         imageButtonOfTree.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                aGame.setScreen(new BoardScreen(aGame, new MenuScreen(aGame), rows, columns));
+                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns));
             }
         });
 
@@ -356,7 +343,7 @@ public class MenuScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                aGame.setScreen(new KindergartenGamePlayBoard(aGame, new MenuScreen(aGame), rows, columns));
+                game.setScreen(new KindergartenGamePlayBoard(game, new MenuScreen(game), rows, columns));
             }
         });
 
@@ -394,7 +381,7 @@ public class MenuScreen implements Screen
 
         if (anInput.isKeyPressed(Keys.B))
         {
-            aGame.setScreen(new BoardScreen(aGame, this, rows, columns));
+            game.setScreen(new MiddleScreen(game, this, rows, columns));
         }
     }
 
@@ -408,7 +395,7 @@ public class MenuScreen implements Screen
     @Override
     public void pause()
     {
-        aGame.forestMusic.play();
+        game.forestMusic.play();
     }
 
     @Override
@@ -420,14 +407,14 @@ public class MenuScreen implements Screen
     @Override
     public void hide()
     {
-        aGame.forestMusic.stop();
+        game.forestMusic.stop();
     }
 
     @Override
     public void dispose()
     {
         forestMusic.dispose();
-        aGame.forestMusic.stop();
-        aGame.dispose();
+        game.forestMusic.stop();
+        game.dispose();
     }
 }

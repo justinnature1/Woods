@@ -6,15 +6,20 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +43,8 @@ public class Woods extends Game
     HashMap<String, Texture> menuTextures;
     HashMap<String, Button> buttons;
     HashMap<String, ImageButton> imageButtons;
+    HashMap<String, TextField> textFields;
+    HashMap<String, Label.LabelStyle> labelStyles;
     Texture[] boardTextures;
     Music forestMusic;
     Music scaryMusic;
@@ -45,6 +52,7 @@ public class Woods extends Game
     OrthographicCamera camera;
     Viewport aViewport;
     Skin someSkin;
+    EventListener exitScreenListener;
 
     final float WORLD_WIDTH = 100;
     final float WORLD_HEIGHT = 100;
@@ -55,12 +63,13 @@ public class Woods extends Game
     @Override
     public void create()
     {
-        someSkin =  new Skin();
+        someSkin = new Skin();
         batch = new SpriteBatch();
         backgroundTextures = new Array<>();
         buttons = new HashMap<>();
         imageButtons = new HashMap<>();
         menuTextures = new HashMap<>();
+        textFields = new HashMap<>();
         boardTextures = new Texture[10];
         this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT); //Sets the game size, the full width/height is the entire length in pixels
         camera.setToOrtho(false);
@@ -80,6 +89,7 @@ public class Woods extends Game
         this.found = Gdx.audio.newSound(Gdx.files.internal("found.wav"));
         createButtons();
         createMenuButtons();
+        createListeners();
         this.setScreen(new MenuScreen(this));
 
     }
@@ -129,16 +139,21 @@ public class Woods extends Game
         menuTextures.put("Bunny", new Texture(Gdx.files.internal("bunny.png")));
         menuTextures.put("SleepingBunny", new Texture(Gdx.files.internal("sleepingBunny.png")));
 
-        boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"));
-        boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"));
-        boardTextures[2] = new Texture(Gdx.files.internal("Tree_Pine_02.png"));
-        boardTextures[3] = new Texture(Gdx.files.internal("Tree_Pine_03.png"));
-        boardTextures[4] = new Texture(Gdx.files.internal("Tree_Pine_04.png"));
-        boardTextures[5] = new Texture(Gdx.files.internal("Tree_Pine_Snow_00.png"));
-        boardTextures[6] = new Texture(Gdx.files.internal("Tree_Pine_Snow_01.png"));
-        boardTextures[7] = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"));
-        boardTextures[8] = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"));
-        boardTextures[9] = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"));
+        boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
+        boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
+        boardTextures[2] = new Texture(Gdx.files.internal("Tree_Pine_02.png"), true);
+        boardTextures[3] = new Texture(Gdx.files.internal("Tree_Pine_03.png"), true);
+        boardTextures[4] = new Texture(Gdx.files.internal("Tree_Pine_04.png"), true);
+        boardTextures[5] = new Texture(Gdx.files.internal("Tree_Pine_Snow_00.png"), true);
+        boardTextures[6] = new Texture(Gdx.files.internal("Tree_Pine_Snow_01.png"), true);
+        boardTextures[7] = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"), true);
+        boardTextures[8] = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"), true);
+        boardTextures[9] = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"), true);
+
+        for (int i = 0; i < boardTextures.length; i++)
+        {
+            boardTextures[i].setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        }
 
         Texture blueTile = new Texture(Gdx.files.internal("blueTile.png"));
     }
@@ -159,6 +174,25 @@ public class Woods extends Game
     private void createButtons()
     {
 
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        someSkin.add("white", new Texture(pixmap));
+        someSkin.add("default", new BitmapFont());
+
+        TextField.TextFieldStyle textFieldStyleThing = new TextField.TextFieldStyle();
+        textFieldStyleThing.background = someSkin.newDrawable("white", Color.DARK_GRAY);
+        textFieldStyleThing.font = medievalFont;
+        textFieldStyleThing.fontColor = Color.WHITE;
+        textFieldStyleThing.selection = someSkin.newDrawable("white", Color.CORAL);
+        textFieldStyleThing.cursor = someSkin.newDrawable("white", Color.BLACK);
+        textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
+        TextField rowTextField = new TextField("2-50", textFieldStyleThing);
+        TextField colTextField = new TextField("2-50", textFieldStyleThing);
+
+        textFields.put("Row", rowTextField);
+        textFields.put("Col", colTextField);
+
         Button.ButtonStyle resetButtonStyle = new Button.ButtonStyle();
         Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
 
@@ -173,10 +207,8 @@ public class Woods extends Game
         resetButtonStyle.up = new TextureRegionDrawable(resetRegion);
         exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
         resetButtonStyle.checked = someSkin.newDrawable("white", Color.DARK_GRAY);
-
         resetButtonStyle.over = someSkin.newDrawable("white", Color.LIME); //This adds a new drawable using the white skin and applying Color.Lime
         exitButtonStyle.over = someSkin.newDrawable("black", Color.CORAL);
-
         Button exitButton = new Button(exitButtonStyle);
         Button resetButton = new Button(resetButtonStyle);
         resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.8f);
@@ -189,5 +221,19 @@ public class Woods extends Game
         resetButton.setWidth((float) resetTexture.getWidth() / 3);
         buttons.put("reset", resetButton);
         buttons.put("exit", exitButton);
+    }
+
+    private void createListeners()
+    {
+        exitScreenListener = new ChangeListener()
+        {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                Gdx.app.exit();
+            }
+        };
+
     }
 }

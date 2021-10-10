@@ -6,12 +6,16 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -45,12 +49,14 @@ public class KindergartenGamePlayBoard implements Screen
     Stage uiStage;
     Camera theCamera;
     Viewport aViewport;
+    Skin someSkin;
 
     Button resetButton;
     Button exitButton;
 
     found foundFunc;
     statistics statisticsFunc;
+
 
     public KindergartenGamePlayBoard(final Woods aGame, MenuScreen aScreen, final int rows, final int columns)
     {
@@ -62,6 +68,7 @@ public class KindergartenGamePlayBoard implements Screen
         theCamera = aScreen.camera;
         aViewport = aScreen.aViewport;
         this.uiStage = new Stage(aViewport);
+        this.someSkin = new Skin();
 
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
@@ -72,8 +79,20 @@ public class KindergartenGamePlayBoard implements Screen
         aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);
         stateOfGame = State.RUN;
+
+        Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
+        Texture exitTexture = game.menuTextures.get("Exit");
+        someSkin.add("exit", exitTexture);
+        TextureRegion exitRegion = new TextureRegion(exitTexture);
+        exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
+        exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
+        exitButton = new Button(exitButtonStyle);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
+
         resetButton = game.buttons.get("reset");
-        exitButton = game.buttons.get("exit");
+
         uiStage.addActor(resetButton);
         uiStage.addActor(exitButton);
 
@@ -94,7 +113,6 @@ public class KindergartenGamePlayBoard implements Screen
             {
 
                 game.largeFont.setColor(Color.YELLOW.r, Color.YELLOW.g, Color.YELLOW.b, 1);
-
 
                 game.largeFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements,
                         1 * aBoardController.pixelBlockWidth, 9 * aBoardController.pixelBlockHeight);
@@ -154,7 +172,7 @@ public class KindergartenGamePlayBoard implements Screen
         aBoardController.drawPlayers(aShape);
         aShape.end();
 
-        game.batch.begin();
+        game.batch.begin(); //DO NOT Use too many being() and end() calls, this will flush the drawing buffer too much
         aBoardController.drawBoard(game.batch);
         aBoardController.drawDirections();
         aBoardController.drawStatistics(statisticsFunc);
