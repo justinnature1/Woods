@@ -98,39 +98,40 @@ public class BoardController
             throw new IllegalArgumentException("Too many players and not enough corners, for default corner locations");
         }
 
-        int currentPlayersAdded = 0;
+        int amountOfPlayersLeftToAdd = 0;
         int xVector = numberOfColumns - 1; //To eliminate index out of bounds exception, subtract 1
         int yVector = numberOfRows - 1;
         int xArrayLocation = 0;
         int yArrayLocation = 0;
+        Player aPlayer;
 
         //TODO Should fix the following loop, just use a simple equation to put players in corners instead
         //This default player creation will create players starting at the Northwest corner
-        while (currentPlayersAdded < this.numberOfPlayers)
+        while (amountOfPlayersLeftToAdd < this.numberOfPlayers)
         {
-            Player aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, "Meow");
-            aPlayers[currentPlayersAdded] = aPlayer;
+            aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, "Meow");
+            aPlayers[amountOfPlayersLeftToAdd] = aPlayer;
             //playerBoard.boardArray[yArrayLocation][xArrayLocation] = aPlayer;
             //tileBoard.getPiecesArray()[yArrayLocation][xArrayLocation].addPiece(aPlayer); Might use this later
-            currentPlayersAdded++;
 
-            //SouthEast Corner
+            //NorthEast Corner
             if (xArrayLocation == 0 && yArrayLocation == 0)
             {
                 xArrayLocation += xVector;
                 yArrayLocation += yVector;
             }
-            //SouthWest Corner
-            else if (xArrayLocation == xVector && yArrayLocation == yVector)
+            //NorthWest Corner
+            else if (xArrayLocation == numberOfColumns - 1 && yArrayLocation == numberOfRows - 1)
             {
                 xArrayLocation -= xVector;
             }
-            //NorthEast Corner
-            else
+            //SouthEast Corner
+            else if(xArrayLocation == 0 && yArrayLocation == numberOfRows - 1)
             {
                 xArrayLocation += xVector;
                 yArrayLocation -= yVector;
             }
+            amountOfPlayersLeftToAdd++;
         }
     }
 
@@ -196,6 +197,7 @@ public class BoardController
 
     /**
      * Takes an array of textures and randomly places them on every block on the gameboard
+     *
      * @param textureArray Texture[]
      */
     public void createArrayOfTextures(Texture[] textureArray)
@@ -242,6 +244,7 @@ public class BoardController
     /**
      * Draws each individual Piece on the board using the Pieces data structure.
      * Must be used between a SpriteBatch.Begin() and SpriteBatch.End()
+     *
      * @param aBatch SpriteBatch
      */
     public void drawBoard(SpriteBatch aBatch)
@@ -261,6 +264,7 @@ public class BoardController
     /**
      * Draws each player that is located in the Players ArrayList
      * MUST be used between Sprit
+     *
      * @param renderer
      */
     public void drawPlayers(ShapeRenderer renderer)

@@ -1,25 +1,20 @@
 package com.woods.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import javax.swing.*;
 
 /**
  * Selection screen for the students BETWEEN kindergarten and 6-8
@@ -27,23 +22,39 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class MiddleScreen implements Screen
 {
 
-    Group someGroup;
+    public enum State
+    {
+        PAUSE,
+        RUN,
+        RESUME,
+        STOPPED,
+        FOUND,
+        SELECTION
+    }
+
+    State gameState; //Used for setting the state of the game, paused, running, selection screen...etc
+    Group labelGroup;
+    Group textFieldGroup;
+    Group buttonGroup;
+    Group imageGroup;
+    Group warningGroup;
     final Woods game;
     final MenuScreen aMenuScreen;
     ShapeRenderer aShape;
     BoardController aBoardController;
+    MenuController aMenuController;
     Skin someSkin;
-    Button exitButton;
     Stage uiStage;
-    TextField rowTextField;
-    TextField colTextField;
     Board boardOfScreen; //Used for dimensions of screen
-    Group textFieldsAndPlayers; //Used for adding text fields and number of players text field
     Background rainDropsBackground;
     float animationStateTime;
+    int rows, columns, players;
 
     public MiddleScreen(Woods game, MenuScreen aMenuScreen, int rows, int columns)
     {
+        this.rows = 10; //Default rows
+        this.columns = 10; //Default columns
+        this.players = 4; //Default Players
         this.game = game;
         this.aMenuScreen = aMenuScreen;
         aShape = new ShapeRenderer();
@@ -51,75 +62,82 @@ public class MiddleScreen implements Screen
         uiStage = new Stage(game.aViewport);
         boardOfScreen = new Board(50, 50, game.camera.viewportWidth / 50,
                 game.camera.viewportHeight / 50);
-        someGroup = new Group();
         rainDropsBackground = new Background(game.backgroundTextures, 30, .05f, game.camera, 4, 4);
         animationStateTime = 0f;
-        createButtons();
+        aMenuController = new MenuController(game, this);
+        aMenuController.createTextFields();
+        aMenuController.createLabels();
+        aMenuController.createButtons();
+        aMenuController.createImages();
+        buttonGroup = aMenuController.getButtonGroup();
+        labelGroup = aMenuController.getLabelGroup();
+        textFieldGroup = aMenuController.getTextFieldGroup();
+        imageGroup = aMenuController.getImageGroup();
+        warningGroup = new Group();
 
-
-
+        addButtonsToStage();
+        addLabelsToStage();
+        addTextFieldsToStage();
+        addImagesToStage();
+        addWarningLabelsToState();
+        gameState = State.SELECTION;
         //aBoardController = new BoardController(game, rows, columns, game.camera.viewportWidth / columns, game.camera.viewportHeight / rows);
     }
 
-    private void createButtons()
+    private void update()
     {
+        Input anInput = Gdx.input;
 
-        //Defining another Exit button here. If you use a previously defined exit button from another object, it will keep the previous
-        //listener definition. Removing the old listener would be ideal
-        Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
-        Texture exitTexture = game.menuTextures.get("Exit");
-        someSkin.add("exit", exitTexture);
-        TextureRegion exitRegion = new TextureRegion(exitTexture);
-        exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
-        exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
-        exitButton = new Button(exitButtonStyle);
-        exitButton.setWidth((float) exitTexture.getWidth() / 4);
-        exitButton.setHeight((float) exitTexture.getHeight() / 4);
-        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
+        if (gameState == State.SELECTION)
+        {
+            if (anInput.isKeyPressed(Input.Keys.ESCAPE))
+            {
+                game.setScreen(aMenuScreen);
+            }
 
-        rowTextField = game.textFields.get("Row");
-        rowTextField.setX(boardOfScreen.blockPixelWidth* 25);
-        rowTextField.setY(boardOfScreen.blockPixelHeight * 20);
-        rowTextField.setText("2-50");
-        someGroup.addActor(rowTextField);
+            if (aMenuController.getRows() < 2 || aMenuController.getRows() > 50)
+            {
+                warningGroup.addActor(aMenuController.getRowWarning());
+            }
+            else
+            {
+                warningGroup.removeActor(aMenuController.getRowWarning());
+            }
+        }
+    }
 
-        colTextField = game.textFields.get("Col");
-        colTextField.setX(boardOfScreen.blockPixelWidth* 25);
-        colTextField.setY(boardOfScreen.blockPixelHeight * 17);
-        colTextField.setText("2-50");
-        someGroup.addActor(colTextField);
+    private void addLabelsToStage()
+    {
+        uiStage.addActor(labelGroup);
+    }
 
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = game.medievalFont;
-        someSkin.add("default", labelStyle);
+    private void addTextFieldsToStage()
+    {
+        uiStage.addActor(textFieldGroup);
+    }
 
-        Label rows = new Label("Rows:", someSkin);
-        rows.setPosition(boardOfScreen.blockPixelWidth * 19, boardOfScreen.blockPixelHeight* 20);
-        Label columns = new Label("Columns:", someSkin);
-        columns.setPosition(boardOfScreen.blockPixelWidth * 19, boardOfScreen.blockPixelHeight * 17);
-        someGroup.addActor(rows);
-        someGroup.addActor(columns);
+    private void addButtonsToStage()
+    {
+        uiStage.addActor(buttonGroup);
+    }
 
+    private void addImagesToStage()
+    {
+        uiStage.addActor(imageGroup);
+    }
 
-        uiStage.addActor(someGroup);
-        uiStage.addActor(exitButton);
-
+    private void addWarningLabelsToState()
+    {
+        uiStage.addActor(warningGroup);
     }
 
     @Override
     public void show()
     {
         Gdx.input.setInputProcessor(uiStage);
+        game.forestMusic.play();
+        aMenuController.addListeners();
 
-        //This button will exit the game in the main menu
-        exitButton.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                game.setScreen(new MenuScreen(game));
-            }
-        });
     }
 
     @Override
@@ -133,8 +151,15 @@ public class MiddleScreen implements Screen
         rainDropsBackground.draw(game.batch, animationStateTime);
         uiStage.act();
         uiStage.draw(); //Draws everything on the stage
+
+        update();
     }
 
+    /**
+     * This adjusts and scales the screen if it is resized. Otherwise will look out of place and too small/big
+     * @param width int
+     * @param height int
+     */
     @Override
     public void resize(int width, int height)
     {

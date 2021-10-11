@@ -48,8 +48,7 @@ public class BoardScreen implements Screen
     BoardController aBoardController;
     Woods game;
     ShapeRenderer aShape;
-    int rows;
-    int columns;
+    int rows, columns, players;
     Screen aScreen;
     State stateOfGame;
     Stage uiStage;
@@ -65,7 +64,7 @@ public class BoardScreen implements Screen
 
     BitmapFont arrowKeyFont;
 
-    public BoardScreen(final Woods aGame, MenuScreen aScreen, final int rows, final int columns)
+    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int players)
     {
 
 
@@ -76,8 +75,8 @@ public class BoardScreen implements Screen
         this.rows = rows;
         this.columns = columns;
         this.aShape = new ShapeRenderer();
-        theCamera = aScreen.camera;
-        aViewport = aScreen.aViewport;
+        theCamera = aGame.camera;
+        aViewport = aGame.aViewport;
         this.uiStage = new Stage(aViewport);
         someSkin = new Skin();
 
@@ -86,7 +85,7 @@ public class BoardScreen implements Screen
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
         aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
-                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, 4);
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, players);
 
         aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);

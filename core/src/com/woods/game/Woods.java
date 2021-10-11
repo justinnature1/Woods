@@ -136,6 +136,7 @@ public class Woods extends Game
         menuTextures.put("DeadTree", new Texture(Gdx.files.internal("deadTree.png")));
         menuTextures.put("Reset", new Texture(Gdx.files.internal("reset.png")));
         menuTextures.put("Exit", new Texture(Gdx.files.internal("exit.png")));
+        menuTextures.put("Start", new Texture(Gdx.files.internal("start.png")));
         menuTextures.put("Bunny", new Texture(Gdx.files.internal("bunny.png")));
         menuTextures.put("SleepingBunny", new Texture(Gdx.files.internal("sleepingBunny.png")));
 
@@ -227,7 +228,6 @@ public class Woods extends Game
     {
         exitScreenListener = new ChangeListener()
         {
-
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {

@@ -22,8 +22,9 @@ import static com.badlogic.gdx.Input.*;
  */
 public class MenuScreen implements Screen
 {
-    Stage someStage;
-    Woods game;
+    Stage someStage; //libGDX object that stores game 'actors' to be drawn on the screen and manipulated
+    Woods game; //Reference to the main game
+    MenuController menuControl; //Creates and adds menu items...text fields and labels, etc
 
     OrthographicCamera camera;
     Viewport aViewport;
@@ -322,7 +323,7 @@ public class MenuScreen implements Screen
             public void changed(ChangeEvent event, Actor actor)
             {
                 game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns));
+                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 4));
             }
         });
 
@@ -334,7 +335,7 @@ public class MenuScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns));
+                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 4));
             }
         });
 
@@ -343,6 +344,7 @@ public class MenuScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
+                game.forestMusic.stop();
                 game.setScreen(new KindergartenGamePlayBoard(game, new MenuScreen(game), rows, columns));
             }
         });
@@ -407,7 +409,7 @@ public class MenuScreen implements Screen
     @Override
     public void hide()
     {
-        game.forestMusic.stop();
+
     }
 
     @Override
