@@ -201,14 +201,14 @@ public class Woods extends Game
         Texture exitTexture = menuTextures.get("Exit");
         TextureRegion exitRegion = new TextureRegion(exitTexture);
         TextureRegion resetRegion = new TextureRegion(resetTexture);
-        someSkin.add("white", resetTexture);
+        someSkin.add("reset", resetTexture);
         someSkin.add("black", exitTexture);
 
 
         resetButtonStyle.up = new TextureRegionDrawable(resetRegion);
         exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
-        resetButtonStyle.checked = someSkin.newDrawable("white", Color.DARK_GRAY);
-        resetButtonStyle.over = someSkin.newDrawable("white", Color.LIME); //This adds a new drawable using the white skin and applying Color.Lime
+        resetButtonStyle.down = someSkin.newDrawable("reset", Color.DARK_GRAY);
+        resetButtonStyle.over = someSkin.newDrawable("reset", Color.FIREBRICK); //This adds a new drawable using the white skin and applying Color.Lime
         exitButtonStyle.over = someSkin.newDrawable("black", Color.CORAL);
         Button exitButton = new Button(exitButtonStyle);
         Button resetButton = new Button(resetButtonStyle);
