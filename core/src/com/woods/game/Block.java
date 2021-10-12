@@ -48,6 +48,11 @@ public abstract class Block
         this.color = color;
     }
 
+    @Override
+    public boolean equals(Object anObject)
+    {
+        return this.xArrayLocation == ((Block) anObject).xArrayLocation && this.yArrayLocation == ((Block) anObject).yArrayLocation;
+    }
 
     public abstract void draw(ShapeRenderer aShape);
 

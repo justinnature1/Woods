@@ -25,8 +25,7 @@ public class Player extends Block
         if (width > height)
         {
             this.radius = height / 2;
-        }
-        else
+        } else
         {
             this.radius = width / 2;
         }
@@ -138,8 +137,7 @@ public class Player extends Block
         if (!anotherBlock.equals(this))
         {
             return this.xArrayLocation == anotherBlock.xArrayLocation && this.yArrayLocation == anotherBlock.yArrayLocation;
-        }
-        else
+        } else
         {
             return false;
         }

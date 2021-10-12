@@ -6,13 +6,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import org.w3c.dom.Text;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is a Board controller class that controls the state of the game board.
@@ -143,16 +141,17 @@ public class BoardController
      */
     public boolean playerConflict()
     {
-        boolean answer;
-        Player firstPlayer = aPlayers[0];
+        ArrayList<Player> playerConflictArrayList = new ArrayList<>();
 
-        for (int i = 1; i < aPlayers.length; i++)
+        for (Player aPlayer : aPlayers)
         {
-            Player anotherPlayer = aPlayers[i];
-            answer = firstPlayer.checkCollision(anotherPlayer);
-            if (answer)
+            if (playerConflictArrayList.contains(aPlayer))
             {
                 return true;
+            }
+            else
+            {
+                playerConflictArrayList.add(aPlayer);
             }
         }
         return false;
