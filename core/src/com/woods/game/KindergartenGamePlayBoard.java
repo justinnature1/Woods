@@ -169,6 +169,7 @@ public class KindergartenGamePlayBoard implements Screen
         aBoardController.drawBoard(aShape);
         aShape.setAutoShapeType(true);
         aShape.set(ShapeRenderer.ShapeType.Filled);
+        aBoardController.drawConflict(aShape);
         aBoardController.drawPlayers(aShape);
         aShape.end();
 

@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import org.w3c.dom.Text;
 
 import java.util.*;
 
@@ -21,6 +18,7 @@ public class BoardController
     Woods game;
     BoardOfPieces tileBoard;
     Board playerBoard;
+    ArrayList<Player> collidedLocations; //Used to remember location of player conflicts
     int numberOfRows;
     int numberOfColumns;
     float pixelBlockWidth;
@@ -50,6 +48,7 @@ public class BoardController
         this.game = aGame;
         this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
+        this.collidedLocations = new ArrayList<>();
         this.numberOfRows = numberOfRows;
         this.numberOfColumns = numberOfColumns;
         this.pixelBlockWidth = pixelBlockWidth;
@@ -124,7 +123,7 @@ public class BoardController
                 xArrayLocation -= xVector;
             }
             //SouthEast Corner
-            else if(xArrayLocation == 0 && yArrayLocation == numberOfRows - 1)
+            else if (xArrayLocation == 0 && yArrayLocation == numberOfRows - 1)
             {
                 xArrayLocation += xVector;
                 yArrayLocation -= yVector;
@@ -147,14 +146,29 @@ public class BoardController
         {
             if (playerConflictArrayList.contains(aPlayer))
             {
+                collidedLocations.add(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, new Color(Color.LIGHT_GRAY),
+                        aPlayer.width, aPlayer.height, "found"));
+                //Pieces somePieces = tileBoard.getPiecesArray()[aPlayer.yArrayLocation][aPlayer.xArrayLocation];
+                //somePieces.addPiece(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, Color.SALMON, aPlayer.width, aPlayer.height, "found"));
+                //aPlayer.color.set(Color.MAGENTA);
                 return true;
-            }
-            else
+            } else
             {
                 playerConflictArrayList.add(aPlayer);
             }
         }
         return false;
+    }
+
+    /**
+     * Draws all the previous and current conflict on the board
+     */
+    public void drawConflict(ShapeRenderer aRenderer)
+    {
+        for (Player aPlayer : collidedLocations)
+        {
+            aPlayer.draw(aRenderer);
+        }
     }
 
     public void drawCollision(found foundFunction)

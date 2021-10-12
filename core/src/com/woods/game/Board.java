@@ -55,4 +55,13 @@ public class Board
         }
     }
 
+    public Block[][] getBoardArray()
+    {
+        return boardArray;
+    }
+
+    public void setBoardArray(Block[][] boardArray)
+    {
+        this.boardArray = boardArray;
+    }
 }
