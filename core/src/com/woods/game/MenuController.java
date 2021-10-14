@@ -1,21 +1,16 @@
 package com.woods.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-
-import java.util.HashMap;
 
 /**
  * This class will eventually abstract much of the menu objects and menu screens and avoid code redundancy
@@ -24,20 +19,22 @@ public class MenuController
 {
     private final Screen aScreen;
     Woods game;
-    Group labelGroup; //Used for storing labels
-    Group textFieldGroup; //Used for storing text fields
-    Group buttonGroup; //Used for storing buttons
-    Group imageGroup; //Used for storing some background images
-    Skin someSkin; //libGDX specific class that is used for styling labels, buttons...etc
+    private Group labelGroup; //Used for storing labels
+    private Group textFieldGroup; //Used for storing text fields
+    private Group buttonGroup; //Used for storing buttons
+    private Group imageGroup; //Used for storing some background images
+    private Skin someSkin; //libGDX specific class that is used for styling labels, buttons...etc
 
     //The screenDimensions Board object will be used for screen dimensions
     //It will be used to convert World coordinates to pixel coordinates
-    Board screenDimensions;
-    int rows, columns, amountOfPlayers;
+    private Board screenDimensions;
+    private int rows, columns, amountOfPlayers;
     private TextField rowTextField;
     private TextField colTextField;
     private TextField playerTextField;
-    private Button exitButton, startButton;
+    private Button exitButton, startButton, infoButton;
+    private ImageTextButton imageOfBunny, imageOfPig;
+    private Label welcomeLabel, rowLabel, columnLabel, playerLabel;
 
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
@@ -60,6 +57,10 @@ public class MenuController
         buttonGroup = new Group();
         labelGroup = new Group();
         imageGroup = new Group();
+        createTextFields();
+        createButtons();
+        createImages();
+        createLabels();
     }
 
     public void createLabels()
@@ -68,9 +69,14 @@ public class MenuController
         Label.LabelStyle selectionLabelStyle = new Label.LabelStyle();
         selectionLabelStyle.font = game.medievalFont;
         someSkin.add("default", selectionLabelStyle);
-        Label rows = new Label("Rows: ", someSkin);
-        Label columns = new Label("Columns: ", someSkin);
-        Label players = new Label("Number of Players: ", someSkin);
+        rowLabel = new Label("Rows: ", someSkin);
+        columnLabel = new Label("Columns: ", someSkin);
+        playerLabel = new Label("Number of Players: ", someSkin);
+
+        Label.LabelStyle welcomeStyle = new Label.LabelStyle();
+        welcomeStyle.font = game.largeFont;
+        someSkin.add("default", welcomeStyle);
+        welcomeLabel = new Label("Welcome to Wandering in the Woods Game", someSkin);
 
         Label.LabelStyle warningLabelStyle = new Label.LabelStyle();
         warningLabelStyle.font = game.monoFont;
@@ -81,11 +87,12 @@ public class MenuController
         playerWarning = new Label("2-4 only!", someSkin);
 
         //Below this code creates the labels and sets their position on screen
-        rows.setPosition(screenDimensions.blockPixelWidth * 19,
+        rowLabel.setPosition(screenDimensions.blockPixelWidth * 19,
                 screenDimensions.blockPixelHeight * 20);
-        columns.setPosition(screenDimensions.blockPixelWidth * 19,
+        columnLabel.setPosition(screenDimensions.blockPixelWidth * 19,
                 screenDimensions.blockPixelHeight * 17);
-        players.setPosition(screenDimensions.blockPixelWidth * 19 - players.getWidth() / 2,
+        welcomeLabel.setPosition(screenDimensions.blockPixelWidth * 10, screenDimensions.blockPixelHeight * 35);
+        playerLabel.setPosition(screenDimensions.blockPixelWidth * 19 - playerLabel.getWidth() / 2,
                 screenDimensions.blockPixelHeight * 14);
         rowWarning.setPosition(screenDimensions.blockPixelWidth * 32,
                 screenDimensions.blockPixelHeight * 20);
@@ -94,9 +101,9 @@ public class MenuController
         playerWarning.setPosition(screenDimensions.blockPixelWidth * 19 + playerWarning.getWidth(),
                 screenDimensions.blockPixelHeight * 14);
 
-        labelGroup.addActor(rows);
-        labelGroup.addActor(columns);
-        labelGroup.addActor(players);
+        labelGroup.addActor(rowLabel);
+        labelGroup.addActor(columnLabel);
+        labelGroup.addActor(playerLabel);
     }
 
     public void createTextFields()
@@ -135,6 +142,7 @@ public class MenuController
     }
 
     /**
+     * NOT necessary to use anymore. Use menu interface to implement listeners on screens instead
      * Adds listeners to the various listener objects, such as textfields and buttons
      */
     public void addListeners()
@@ -269,8 +277,48 @@ public class MenuController
         startButton.setX(screenDimensions.blockPixelWidth * WORLD_WIDTH / 2);
         startButton.setY(screenDimensions.blockPixelHeight * 10);
 
-        buttonGroup.addActor(startButton);
-        buttonGroup.addActor(exitButton);
+        Button.ButtonStyle infoButtonStyle = new Button.ButtonStyle();
+        Texture infoTexture = game.menuTextures.get("Info");
+        TextureRegion infoRegion = new TextureRegion(infoTexture);
+        someSkin.add("info", infoTexture);
+        infoButtonStyle.up = new TextureRegionDrawable(infoRegion);
+        infoButtonStyle.down = someSkin.newDrawable("info", Color.DARK_GRAY);
+        infoButtonStyle.over = someSkin.newDrawable("info", Color.CORAL);
+        infoButton = new Button(infoButtonStyle);
+        infoButton.setSize(screenDimensions.blockPixelWidth * 4, screenDimensions.blockPixelHeight * 3);
+        infoButton.setX(screenDimensions.blockPixelWidth * 50 - infoButton.getWidth());
+
+
+        //Placing button data in Main Game will lead to a LARGE slowdown
+        ImageTextButton.ImageTextButtonStyle pigButtonStyle = new ImageTextButton.ImageTextButtonStyle();
+        //pigButtonStyle.fontColor = Color.RED;
+        pigButtonStyle.font = game.largeFont;
+        pigButtonStyle.overFontColor = Color.RED;
+        TextureRegion bunnyRegion = new TextureRegion(game.menuTextures.get("SleepingBunny"));
+        someSkin.add("bunny", bunnyRegion);
+        pigButtonStyle.up = new TextureRegionDrawable(bunnyRegion);
+        pigButtonStyle.over = someSkin.newDrawable("bunny", Color.CORAL);
+        imageOfBunny = new ImageTextButton("K-2", pigButtonStyle);
+        imageOfBunny.setX(5 * screenDimensions.blockPixelWidth);
+        imageOfBunny.setY(8 * screenDimensions.blockPixelHeight);
+        imageOfBunny.setSize(300, 200);
+
+
+        Texture pigTexture = game.menuTextures.get("Pig");
+        TextureRegion pigRegion = new TextureRegion(pigTexture);
+        ImageTextButton.ImageTextButtonStyle pigStyle = new ImageTextButton.ImageTextButtonStyle();
+        pigStyle.overFontColor = Color.RED;
+        pigStyle.font = game.largeFont;
+        Image pigImage = new Image(pigRegion);
+        pigImage.setSize(screenDimensions.blockPixelWidth * 5, screenDimensions.blockPixelHeight * 5);
+        pigImage.setX(25 * screenDimensions.blockPixelWidth);
+        someSkin.add("pig", pigRegion);
+        pigStyle.up = new TextureRegionDrawable(pigRegion);
+        pigStyle.over = someSkin.newDrawable("pig", Color.CORAL);
+        imageOfPig = new ImageTextButton("3-5", pigStyle);
+        imageOfPig.setY(5 * screenDimensions.blockPixelHeight);
+        imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
+
     }
 
     /**
@@ -282,10 +330,21 @@ public class MenuController
         int widthOfTree = 300;
         Texture slantedTreeTexture = game.menuTextures.get("SlantedTree");
         Image slantedTreeImage = new Image(slantedTreeTexture);
-        slantedTreeImage.setSize(widthOfTree, heightOfTree);
+        slantedTreeImage.setSize(screenDimensions.blockPixelWidth * 14, screenDimensions.blockPixelHeight * 22);
+        slantedTreeImage.setScale(.9f);
         slantedTreeImage.setX(screenDimensions.blockPixelWidth * WORLD_WIDTH - widthOfTree); //Subtract width to make sure it doesn't go off screen
         slantedTreeImage.setY(0);
 
+        Texture deadTreeTexture = game.menuTextures.get("DeadTree");
+        TextureRegion deadTreeRegion = new TextureRegion(deadTreeTexture);
+        //ImageButton.ImageButtonStyle imageStyle = new ImageButton.ImageButtonStyle();
+        Image deadTreeImage = new Image(deadTreeRegion);
+        deadTreeImage.setSize(screenDimensions.blockPixelWidth * 10, screenDimensions.blockPixelHeight * 20);
+        float yPositionDeadTree = screenDimensions.blockPixelHeight * 30;
+        deadTreeImage.setY(yPositionDeadTree);
+        someSkin.add("tree", deadTreeRegion);
+
+        imageGroup.addActor(deadTreeImage);
         imageGroup.addActor(slantedTreeImage);
     }
 
@@ -332,5 +391,125 @@ public class MenuController
     public int getColumns()
     {
         return columns;
+    }
+
+    public Button getExitButton()
+    {
+        return exitButton;
+    }
+
+    public void setExitButton(Button exitButton)
+    {
+        this.exitButton = exitButton;
+    }
+
+    public Button getStartButton()
+    {
+        return startButton;
+    }
+
+    public void setStartButton(Button startButton)
+    {
+        this.startButton = startButton;
+    }
+
+    public Button getInfoButton()
+    {
+        return infoButton;
+    }
+
+    public void setInfoButton(Button infoButton)
+    {
+        this.infoButton = infoButton;
+    }
+
+    public TextField getRowTextField()
+    {
+        return rowTextField;
+    }
+
+    public void setRowTextField(TextField rowTextField)
+    {
+        this.rowTextField = rowTextField;
+    }
+
+    public TextField getColTextField()
+    {
+        return colTextField;
+    }
+
+    public void setColTextField(TextField colTextField)
+    {
+        this.colTextField = colTextField;
+    }
+
+    public TextField getPlayerTextField()
+    {
+        return playerTextField;
+    }
+
+    public void setPlayerTextField(TextField playerTextField)
+    {
+        this.playerTextField = playerTextField;
+    }
+
+    public ImageTextButton getImageOfBunny()
+    {
+        return imageOfBunny;
+    }
+
+    public void setImageOfBunny(ImageTextButton imageOfBunny)
+    {
+        this.imageOfBunny = imageOfBunny;
+    }
+
+    public ImageTextButton getImageOfPig()
+    {
+        return imageOfPig;
+    }
+
+    public void setImageOfPig(ImageTextButton imageOfPig)
+    {
+        this.imageOfPig = imageOfPig;
+    }
+
+    public Label getWelcomeLabel()
+    {
+        return welcomeLabel;
+    }
+
+    public void setWelcomeLabel(Label welcomeLabel)
+    {
+        this.welcomeLabel = welcomeLabel;
+    }
+
+    public Label getRowLabel()
+    {
+        return rowLabel;
+    }
+
+    public void setRowLabel(Label rowLabel)
+    {
+        this.rowLabel = rowLabel;
+    }
+
+    public Label getColumnLabel()
+    {
+        return columnLabel;
+    }
+
+    public void setColumnLabel(Label columnLabel)
+    {
+        this.columnLabel = columnLabel;
+    }
+
+    public Label getPlayerLabel()
+    {
+        return playerLabel;
+    }
+
+    public void setPlayerLabel(Label playerLabel)
+    {
+        this.playerLabel = playerLabel;
     }
 }

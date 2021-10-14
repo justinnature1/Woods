@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -19,7 +17,7 @@ import javax.swing.*;
 /**
  * Selection screen for the students BETWEEN kindergarten and 6-8
  */
-public class MiddleScreen implements Screen
+public class MiddleScreen implements Screen, Menu
 {
 
     public enum State
@@ -32,19 +30,20 @@ public class MiddleScreen implements Screen
         SELECTION
     }
 
+    MiddleScreen aMiddleScreen;
     State gameState; //Used for setting the state of the game, paused, running, selection screen...etc
-    Group labelGroup;
-    Group textFieldGroup;
-    Group buttonGroup;
-    Group imageGroup;
-    Group warningGroup;
+    Group labelGroup, textFieldGroup, buttonSelectionGroup, imageGroup, warningGroup, backgroundGroup;
+    TextField rowTextField, colTextField, playerTextField;
+    Button exitButton, startButton;
+    Label rowLabel, colLabel, playerLabel;
+
     final Woods game;
     final MenuScreen aMenuScreen;
     ShapeRenderer aShape;
     BoardController aBoardController;
     MenuController aMenuController;
     Skin someSkin;
-    Stage uiStage;
+    Stage uiStage, backgroundStage;
     Board boardOfScreen; //Used for dimensions of screen
     Background rainDropsBackground;
     float animationStateTime;
@@ -52,6 +51,7 @@ public class MiddleScreen implements Screen
 
     public MiddleScreen(Woods game, MenuScreen aMenuScreen, int rows, int columns)
     {
+        aMiddleScreen = this;
         this.rows = 10; //Default rows
         this.columns = 10; //Default columns
         this.players = 4; //Default Players
@@ -60,28 +60,176 @@ public class MiddleScreen implements Screen
         aShape = new ShapeRenderer();
         someSkin = new Skin();
         uiStage = new Stage(game.aViewport);
+        backgroundStage = new Stage(game.aViewport);
         boardOfScreen = new Board(50, 50, game.camera.viewportWidth / 50,
                 game.camera.viewportHeight / 50);
         rainDropsBackground = new Background(game.backgroundTextures, 30, .05f, game.camera, 4, 4);
         animationStateTime = 0f;
         aMenuController = new MenuController(game, this);
-        aMenuController.createTextFields();
-        aMenuController.createLabels();
-        aMenuController.createButtons();
-        aMenuController.createImages();
-        buttonGroup = aMenuController.getButtonGroup();
-        labelGroup = aMenuController.getLabelGroup();
-        textFieldGroup = aMenuController.getTextFieldGroup();
-        imageGroup = aMenuController.getImageGroup();
+        labelGroup = new Group();
+        textFieldGroup = new Group();
+        buttonSelectionGroup = new Group();
+        backgroundGroup = new Group();
         warningGroup = new Group();
+        addBackground();
+        addButtons();
+        addTextFields();
+        addLabels();
+        assembleMenu();
 
-        addButtonsToStage();
-        addLabelsToStage();
-        addTextFieldsToStage();
-        addImagesToStage();
-        addWarningLabelsToState();
         gameState = State.SELECTION;
         //aBoardController = new BoardController(game, rows, columns, game.camera.viewportWidth / columns, game.camera.viewportHeight / rows);
+    }
+
+    @Override
+    public void addLabels()
+    {
+        rowLabel = aMenuController.getRowLabel();
+        colLabel = aMenuController.getColumnLabel();
+        playerLabel = aMenuController.getPlayerLabel();
+        labelGroup.addActor(rowLabel);
+        labelGroup.addActor(colLabel);
+        labelGroup.addActor(playerLabel);
+    }
+
+    @Override
+    public void addTextFields()
+    {
+        rowTextField = aMenuController.getRowTextField();
+        colTextField = aMenuController.getColTextField();
+        playerTextField = aMenuController.getPlayerTextField();
+        textFieldGroup.addActor(rowTextField);
+        textFieldGroup.addActor(colTextField);
+        textFieldGroup.addActor(playerTextField);
+    }
+
+    @Override
+    public void addBackground()
+    {
+        backgroundGroup = aMenuController.getImageGroup();
+    }
+
+    @Override
+    public void addButtons()
+    {
+        startButton = aMenuController.getStartButton();
+        exitButton = aMenuController.getExitButton();
+        buttonSelectionGroup.addActor(exitButton);
+        buttonSelectionGroup.addActor(startButton);
+    }
+
+    @Override
+    public void assembleMenu()
+    {
+        backgroundStage.addActor(backgroundGroup);
+        uiStage.addActor(textFieldGroup);
+        uiStage.addActor(buttonSelectionGroup);
+        uiStage.addActor(labelGroup);
+        uiStage.addActor(exitButton);
+    }
+
+    @Override
+    public void addListeners()
+    {
+        rowTextField.setTextFieldListener(new TextField.TextFieldListener()
+        {
+            @Override
+            public void keyTyped(TextField textField, char c)
+            {
+                boolean done = false;
+
+                while (!done)
+                {
+                    try
+                    {
+                        int tempRows = Integer.parseInt(textField.getText());
+                        if (tempRows >= 2 && tempRows <= 50)
+                        {
+                            rows = tempRows;
+                        }
+                        done = true;
+                    } catch (Exception e)
+                    {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            }
+        });
+
+
+        colTextField.setTextFieldListener(new TextField.TextFieldListener()
+        {
+            @Override
+            public void keyTyped(TextField textField, char c)
+            {
+                boolean done = false;
+
+                while (!done)
+                {
+                    try
+                    {
+                        int tempColumns = Integer.parseInt(textField.getText());
+                        if (tempColumns >= 2 && tempColumns <= 50)
+                        {
+                            columns = tempColumns;
+                            done = true;
+                        } else
+                        {
+                            break;
+                        }
+                    } catch (Exception e)
+                    {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            }
+        });
+
+        startButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                game.forestMusic.stop();
+                game.setScreen(new BoardScreen(game, aMiddleScreen, rows, columns, players));
+            }
+        });
+
+        exitButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                game.setScreen(aMenuScreen);
+            }
+        });
+
+        playerTextField.setTextFieldListener(new TextField.TextFieldListener()
+        {
+            public void keyTyped(TextField textField, char c)
+            {
+                boolean done = false;
+
+                while (!done)
+                {
+                    try
+                    {
+                        int tempPlayers = Integer.parseInt(textField.getText());
+                        if (tempPlayers >= 2 && tempPlayers <= 4)
+                        {
+                            players = tempPlayers;
+                        }
+                        done = true;
+                    } catch (Exception e)
+                    {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void update()
@@ -98,8 +246,7 @@ public class MiddleScreen implements Screen
             if (aMenuController.getRows() < 2 || aMenuController.getRows() > 50)
             {
                 warningGroup.addActor(aMenuController.getRowWarning());
-            }
-            else
+            } else
             {
                 warningGroup.removeActor(aMenuController.getRowWarning());
             }
@@ -118,7 +265,7 @@ public class MiddleScreen implements Screen
 
     private void addButtonsToStage()
     {
-        uiStage.addActor(buttonGroup);
+        uiStage.addActor(buttonSelectionGroup);
     }
 
     private void addImagesToStage()
@@ -136,8 +283,7 @@ public class MiddleScreen implements Screen
     {
         Gdx.input.setInputProcessor(uiStage);
         game.forestMusic.play();
-        aMenuController.addListeners();
-
+        addListeners();
     }
 
     @Override
@@ -149,6 +295,8 @@ public class MiddleScreen implements Screen
         animationStateTime += Gdx.graphics.getDeltaTime(); // getDeltaTime() is the amount of time since the last frame rendered
 
         rainDropsBackground.draw(game.batch, animationStateTime);
+        backgroundStage.act();
+        backgroundStage.draw();
         uiStage.act();
         uiStage.draw(); //Draws everything on the stage
 
@@ -157,7 +305,8 @@ public class MiddleScreen implements Screen
 
     /**
      * This adjusts and scales the screen if it is resized. Otherwise will look out of place and too small/big
-     * @param width int
+     *
+     * @param width  int
      * @param height int
      */
     @Override

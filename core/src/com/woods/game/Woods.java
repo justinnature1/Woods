@@ -139,6 +139,8 @@ public class Woods extends Game
         menuTextures.put("Start", new Texture(Gdx.files.internal("start.png")));
         menuTextures.put("Bunny", new Texture(Gdx.files.internal("bunny.png")));
         menuTextures.put("SleepingBunny", new Texture(Gdx.files.internal("sleepingBunny.png")));
+        menuTextures.put("Info", new Texture(Gdx.files.internal("info.png")));
+        menuTextures.put("Pig", new Texture(Gdx.files.internal("pig.png")));
 
         boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
         boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
@@ -196,22 +198,31 @@ public class Woods extends Game
 
         Button.ButtonStyle resetButtonStyle = new Button.ButtonStyle();
         Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
+        Button.ButtonStyle infoButtonStyle = new Button.ButtonStyle();
 
+        Texture infoTexture = menuTextures.get("Info");
         Texture resetTexture = menuTextures.get("Reset");
         Texture exitTexture = menuTextures.get("Exit");
         TextureRegion exitRegion = new TextureRegion(exitTexture);
         TextureRegion resetRegion = new TextureRegion(resetTexture);
+        TextureRegion infoRegion = new TextureRegion(infoTexture);
         someSkin.add("reset", resetTexture);
         someSkin.add("black", exitTexture);
+        someSkin.add("info", infoTexture);
 
 
         resetButtonStyle.up = new TextureRegionDrawable(resetRegion);
         exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
+        infoButtonStyle.up = new TextureRegionDrawable(infoRegion);
+
         resetButtonStyle.down = someSkin.newDrawable("reset", Color.DARK_GRAY);
         resetButtonStyle.over = someSkin.newDrawable("reset", Color.FIREBRICK); //This adds a new drawable using the white skin and applying Color.Lime
+        infoButtonStyle.down = someSkin.newDrawable("info", Color.DARK_GRAY);
+        infoButtonStyle.over = someSkin.newDrawable("info", Color.CORAL);
         exitButtonStyle.over = someSkin.newDrawable("black", Color.CORAL);
         Button exitButton = new Button(exitButtonStyle);
         Button resetButton = new Button(resetButtonStyle);
+        Button infoButton = new Button(exitButtonStyle);
         resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.8f);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
         resetButton.setX(camera.viewportWidth - 110);
