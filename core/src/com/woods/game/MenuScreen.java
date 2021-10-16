@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.*;
 
@@ -28,6 +27,7 @@ public class MenuScreen implements Screen, Menu
     Woods game; //Reference to the main game
     MenuController menuControl; //Creates and adds menu items...text fields and labels, etc
     Group backgroundGroup, buttonGroup;
+    MenuScreen currentScreen;
 
     OrthographicCamera camera;
     Viewport aViewport;
@@ -47,6 +47,7 @@ public class MenuScreen implements Screen, Menu
 
     public MenuScreen(Woods game)
     {
+        this.currentScreen = this;
         this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
         this.menuControl = new MenuController(game, this);
         this.backgroundGroup = new Group();
@@ -134,6 +135,16 @@ public class MenuScreen implements Screen, Menu
                 game.setScreen(new KindergartenGamePlayBoard(game, new MenuScreen(game), rows, columns));
             }
         });
+
+        infoButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                game.setScreen(new InfoScreen(game, currentScreen));
+
+            }
+        });
     }
 
     /**
@@ -143,7 +154,7 @@ public class MenuScreen implements Screen, Menu
     public void addBackground()
     {
         Label welcomeLabel = menuControl.getWelcomeLabel();
-        backgroundGroup = menuControl.getImageGroup();
+        backgroundGroup = menuControl.getBackgroundTreeImageGroup();
         backgroundGroup.addActor(welcomeLabel);
     }
 
@@ -173,6 +184,18 @@ public class MenuScreen implements Screen, Menu
         buttonGroup.toFront();
         backgroundStage.addActor(backgroundGroup);
         stageUI.addActor(buttonGroup);
+    }
+
+    @Override
+    public boolean removeLabels()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean removeListeners()
+    {
+        return false;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.woods.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 
 /**
  * This class will eventually abstract much of the menu objects and menu screens and avoid code redundancy
@@ -22,7 +24,7 @@ public class MenuController
     private Group labelGroup; //Used for storing labels
     private Group textFieldGroup; //Used for storing text fields
     private Group buttonGroup; //Used for storing buttons
-    private Group imageGroup; //Used for storing some background images
+    private Group backgroundTreeImageGroup; //Used for storing some background images
     private Skin someSkin; //libGDX specific class that is used for styling labels, buttons...etc
 
     //The screenDimensions Board object will be used for screen dimensions
@@ -32,15 +34,18 @@ public class MenuController
     private TextField rowTextField;
     private TextField colTextField;
     private TextField playerTextField;
-    private Button exitButton, startButton, infoButton;
+    private Button exitButton, startButton, infoButton, backButton, okayButton;
     private ImageTextButton imageOfBunny, imageOfPig;
-    private Label welcomeLabel, rowLabel, columnLabel, playerLabel;
+    private Label welcomeLabel, rowLabel, columnLabel, playerLabel, gameInfoLabel, k2InfoLabel,
+            threeToFiveInfoLabel;
 
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
     private Label rowWarning;
     private Label colWarning;
     private Label playerWarning;
+
+    private Background rainDropsBackground;
 
     public MenuController(Woods game, Screen aScreen)
     {
@@ -56,7 +61,7 @@ public class MenuController
         textFieldGroup = new Group();
         buttonGroup = new Group();
         labelGroup = new Group();
-        imageGroup = new Group();
+        backgroundTreeImageGroup = new Group();
         createTextFields();
         createButtons();
         createImages();
@@ -72,6 +77,26 @@ public class MenuController
         rowLabel = new Label("Rows: ", someSkin);
         columnLabel = new Label("Columns: ", someSkin);
         playerLabel = new Label("Number of Players: ", someSkin);
+
+        Label.LabelStyle gameInfoStyleLabel = new Label.LabelStyle();
+        gameInfoStyleLabel.font = game.medievalFont;
+        someSkin.add("default", gameInfoStyleLabel);
+        gameInfoLabel = new Label("This game will simulate players 'lost in the woods'.\n'" +
+                "Players will wander in random directions until they meet eachother.\n" +
+                "Click on a grade level for more information.", someSkin);
+        gameInfoLabel.setWrap(false);
+        gameInfoLabel.setAlignment(Align.center);
+
+        k2InfoLabel = new Label("This game mode is made for the youngest age group.\n" +
+                "Game will start with 4 players with 10 rows and 10 columns.", someSkin);
+        k2InfoLabel.setWrap(false);
+        k2InfoLabel.setAlignment(Align.center);
+
+        threeToFiveInfoLabel = new Label("This game mode is made for grades 3-5.\n" +
+                "Students will be able to choose the amount of rows and columns\n" +
+                "And the amount of players, including a starting position if desired.", someSkin);
+        threeToFiveInfoLabel.setWrap(false);
+        threeToFiveInfoLabel.setAlignment(Align.center);
 
         Label.LabelStyle welcomeStyle = new Label.LabelStyle();
         welcomeStyle.font = game.largeFont;
@@ -260,8 +285,8 @@ public class MenuController
         exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
         exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
         exitButton = new Button(exitButtonStyle);
-        exitButton.setWidth((float) exitTexture.getWidth() / 4);
-        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setWidth((float) exitTexture.getWidth() / 3);
+        exitButton.setHeight((float) exitTexture.getHeight() / 3);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
         Button.ButtonStyle startButtonStyle = new Button.ButtonStyle();
@@ -319,6 +344,23 @@ public class MenuController
         imageOfPig.setY(5 * screenDimensions.blockPixelHeight);
         imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
 
+        Button.ButtonStyle backStyle = new Button.ButtonStyle();
+        Texture backTexture = new Texture(Gdx.files.internal("back.png"));
+        backStyle.up = new TextureRegionDrawable(backTexture);
+        backStyle.over = new TextureRegionDrawable(backTexture).tint(Color.CYAN);
+        backButton = new Button(backStyle);
+        backButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        backButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
+
+        Button.ButtonStyle okayStyle = new Button.ButtonStyle();
+        Texture okayTexture = new Texture(Gdx.files.internal("okay2.png"));
+        okayStyle.up = new TextureRegionDrawable(okayTexture);
+        okayStyle.over = new TextureRegionDrawable(okayTexture).tint(Color.CYAN);
+        okayButton = new Button(okayStyle);
+        okayButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        okayButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
     }
 
     /**
@@ -344,8 +386,11 @@ public class MenuController
         deadTreeImage.setY(yPositionDeadTree);
         someSkin.add("tree", deadTreeRegion);
 
-        imageGroup.addActor(deadTreeImage);
-        imageGroup.addActor(slantedTreeImage);
+        rainDropsBackground = new Background(game.backgroundTextures, 30,
+                .05f, game.camera, 4, 4);
+
+        backgroundTreeImageGroup.addActor(deadTreeImage);
+        backgroundTreeImageGroup.addActor(slantedTreeImage);
     }
 
     public Group getTextFieldGroup()
@@ -363,9 +408,9 @@ public class MenuController
         return buttonGroup;
     }
 
-    public Group getImageGroup()
+    public Group getBackgroundTreeImageGroup()
     {
-        return imageGroup;
+        return backgroundTreeImageGroup;
     }
 
     public Label getRowWarning()
@@ -511,5 +556,50 @@ public class MenuController
     public void setPlayerLabel(Label playerLabel)
     {
         this.playerLabel = playerLabel;
+    }
+
+    public Button getBackButton()
+    {
+        return backButton;
+    }
+
+    public void setBackButton(Button backButton)
+    {
+        this.backButton = backButton;
+    }
+
+    public Background getRainDropsBackground()
+    {
+        return rainDropsBackground;
+    }
+
+    public void setRainDropsBackground(Background rainDropsBackground)
+    {
+        this.rainDropsBackground = rainDropsBackground;
+    }
+
+    public Label getGameInfoLabel()
+    {
+        return gameInfoLabel;
+    }
+
+    public void setGameInfoLabel(Label gameInfoLabel)
+    {
+        this.gameInfoLabel = gameInfoLabel;
+    }
+
+    public Label getK2InfoLabel()
+    {
+        return k2InfoLabel;
+    }
+
+    public Button getOkayButton()
+    {
+        return okayButton;
+    }
+
+    public Label getThreeToFiveInfoLabel()
+    {
+        return threeToFiveInfoLabel;
     }
 }

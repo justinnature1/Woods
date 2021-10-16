@@ -2,9 +2,10 @@ package com.woods.game;
 
 public interface Menu
 {
-
+    /**
+     * Assigns a background
+     */
     void addBackground();
-
     /**
      * Assigns buttons to the screen
      */
@@ -13,4 +14,6 @@ public interface Menu
     void addListeners();
     void addLabels();
     void addTextFields();
+    boolean removeLabels();
+    boolean removeListeners();
 }

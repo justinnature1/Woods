@@ -106,7 +106,7 @@ public class MiddleScreen implements Screen, Menu
     @Override
     public void addBackground()
     {
-        backgroundGroup = aMenuController.getImageGroup();
+        backgroundGroup = aMenuController.getBackgroundTreeImageGroup();
     }
 
     @Override
@@ -230,6 +230,18 @@ public class MiddleScreen implements Screen, Menu
                 }
             }
         });
+    }
+
+    @Override
+    public boolean removeLabels()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean removeListeners()
+    {
+        return false;
     }
 
     private void update()

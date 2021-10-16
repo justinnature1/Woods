@@ -141,6 +141,8 @@ public class Woods extends Game
         menuTextures.put("SleepingBunny", new Texture(Gdx.files.internal("sleepingBunny.png")));
         menuTextures.put("Info", new Texture(Gdx.files.internal("info.png")));
         menuTextures.put("Pig", new Texture(Gdx.files.internal("pig.png")));
+        menuTextures.put("Back", new Texture(Gdx.files.internal("back.png")));
+        menuTextures.put("Okay", new Texture(Gdx.files.internal("okay2.png")));
 
         boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
         boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
