@@ -374,7 +374,7 @@ public class MenuController
         Image slantedTreeImage = new Image(slantedTreeTexture);
         slantedTreeImage.setSize(screenDimensions.blockPixelWidth * 14, screenDimensions.blockPixelHeight * 22);
         slantedTreeImage.setScale(.9f);
-        slantedTreeImage.setX(screenDimensions.blockPixelWidth * WORLD_WIDTH - widthOfTree); //Subtract width to make sure it doesn't go off screen
+        slantedTreeImage.setX(game.camera.viewportWidth - slantedTreeImage.getWidth()); //Subtract width to make sure it doesn't go off screen
         slantedTreeImage.setY(0);
 
         Texture deadTreeTexture = game.menuTextures.get("DeadTree");
