@@ -27,6 +27,7 @@ public class MenuScreen implements Screen, Menu
     Woods game; //Reference to the main game
     MenuController menuControl; //Creates and adds menu items...text fields and labels, etc
     Group backgroundGroup, buttonGroup;
+    MenuScreen currentScreen;
 
     OrthographicCamera camera;
     Viewport aViewport;
@@ -46,6 +47,7 @@ public class MenuScreen implements Screen, Menu
 
     public MenuScreen(Woods game)
     {
+        this.currentScreen = this;
         this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
         this.menuControl = new MenuController(game, this);
         this.backgroundGroup = new Group();
@@ -58,13 +60,13 @@ public class MenuScreen implements Screen, Menu
         this.camera = game.camera;
         this.rootTable = new Table();
         camera.setToOrtho(false);
-        aViewport = game.aViewport;
-        aViewport.apply();
+        //aViewport = game.aViewport;
+        //aViewport.apply();
         aBoard = new Board(50, 50, camera.viewportWidth / 50,
                 camera.viewportHeight / 50);
 
-        stageUI = new Stage(aViewport);
-        backgroundStage = new Stage(aViewport);
+        stageUI = new Stage(game.aViewport);
+        backgroundStage = new Stage(game.aViewport);
 
         this.columns = 10;
         this.rows = 10;
@@ -143,6 +145,16 @@ public class MenuScreen implements Screen, Menu
                 game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 2));
             }
         });
+
+        infoButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                game.setScreen(new InfoScreen(game, currentScreen));
+
+            }
+        });
     }
 
     /**
@@ -152,7 +164,7 @@ public class MenuScreen implements Screen, Menu
     public void addBackground()
     {
         Label welcomeLabel = menuControl.getWelcomeLabel();
-        backgroundGroup = menuControl.getImageGroup();
+        backgroundGroup = menuControl.getBackgroundTreeImageGroup();
         backgroundGroup.addActor(welcomeLabel);
     }
 
@@ -186,6 +198,18 @@ public class MenuScreen implements Screen, Menu
         stageUI.addActor(buttonGroup);
     }
 
+    @Override
+    public boolean removeLabels()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean removeListeners()
+    {
+        return false;
+    }
+
     /**
      * Draws to the screen, a rasterizer
      *
@@ -199,7 +223,7 @@ public class MenuScreen implements Screen, Menu
         animationStatetime += Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
-        aBatch.setProjectionMatrix(camera.combined);
+        aBatch.setProjectionMatrix(game.camera.combined);
         raindropsBackground.draw(aBatch, animationStatetime);
 
         backgroundStage.act();
@@ -226,8 +250,7 @@ public class MenuScreen implements Screen, Menu
     @Override
     public void resize(int width, int height)
     {
-        stageUI.getViewport().update(width, height);
-        this.aViewport.update(width, height);
+        game.aViewport.update(width, height);
     }
 
     @Override

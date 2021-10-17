@@ -40,7 +40,7 @@ public class BoardScreen implements Screen
         RESUME,
         STOPPED,
         FOUND,
-        PLACEMENT
+
     }
 
     OrthographicCamera theCamera;
@@ -49,10 +49,7 @@ public class BoardScreen implements Screen
     BoardController aBoardController;
     Woods game;
     ShapeRenderer aShape;
-    int rows, columns;
-    Screen aScreen;
-    State stateOfGame;
-    State beginningState;
+
     Stage uiStage;
     int rightSideBuffer;
     int bottomEdgeBuffer;
@@ -69,7 +66,6 @@ public class BoardScreen implements Screen
 
     BitmapFont arrowKeyFont;
 
-    private BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, State stateOfGame){
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
 
         this.aScreen = aScreen;
@@ -103,8 +99,7 @@ public class BoardScreen implements Screen
         exitButton.setHeight((float) exitTexture.getHeight() / 4);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
-        this.stateOfGame = stateOfGame;
-        this.beginningState = stateOfGame;
+
         resetButton = game.buttons.get("reset");
 
         uiStage.addActor(resetButton);
@@ -176,7 +171,13 @@ public class BoardScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                resetBoard();
+                try
+                {
+                    resetBoard();
+                } catch (CloneNotSupportedException e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -249,7 +250,13 @@ public class BoardScreen implements Screen
             }
         }
 
-        update();
+        try
+        {
+            update();
+        } catch (CloneNotSupportedException e)
+        {
+            e.printStackTrace();
+        }
 
         if (stateOfGame == State.FOUND)
         {
@@ -279,7 +286,7 @@ public class BoardScreen implements Screen
     /**
      * Updates the state of the game (collisions and movement) and collects keyboard input
      */
-    public void update()
+    public void update() throws CloneNotSupportedException
     {
 
         //TODO Write a pause text when pressing spacebar
@@ -369,15 +376,26 @@ public class BoardScreen implements Screen
     /**
      * Resets the board and player location to defaults
      */
-    private void resetBoard()
+    private void resetBoard() throws CloneNotSupportedException
     {
-
+        if (selectState == SelectionState.DEFAULT)
+        {
+            aBoardController.createPlayersDefaultLocation();
+            stateOfGame = State.RUN;
+            aBoardController.totalPlayerMovements = 0;
+            aBoardController.playerUpdateTime = 0.3f;
+            this.pause();
+        }
+        else
+        {
+            aBoardController.setPlayersToOriginalLocation();
+            stateOfGame = State.RUN;
+            aBoardController.totalPlayerMovements = 0;
+            aBoardController.playerUpdateTime = 0.3f;
+            this.pause();
+        }
         //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.resetPlayers();
-        stateOfGame = beginningState;
-        aBoardController.totalPlayerMovements = 0;
-        aBoardController.playerUpdateTime = 0.3f;
-        this.pause();
+
 
     }
 

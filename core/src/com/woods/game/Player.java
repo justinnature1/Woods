@@ -165,6 +165,13 @@ public class Player extends Block
     }
 
     @Override
+    protected Object clone() throws CloneNotSupportedException
+    {
+        Player newPlayer = new Player(xArrayLocation, yArrayLocation, Color.RED, width, height, name);
+        return newPlayer;
+    }
+
+    @Override
     public void fade(ShapeRenderer aShape)
     {
         color.set(color.r, color.g, color.b, 0.5f);

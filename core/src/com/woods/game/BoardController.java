@@ -24,8 +24,7 @@ public class BoardController
     int numberOfColumns;
     float pixelBlockWidth;
     float pixelBlockHeight;
-    List<Player> aPlayers = new ArrayList<>();
-    List<Player> beginningPlayers = new ArrayList<>();
+
     int totalPlayerMovements;
     float totalTimesRan, totalMovements, average;
 
@@ -125,6 +124,27 @@ public class BoardController
         return null;
     }
 
+    public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers,
+                           Player[] playerArray) throws CloneNotSupportedException
+    {
+        this.game = aGame;
+        this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
+        this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
+        this.collidedLocations = new ArrayList<>();
+        this.numberOfRows = numberOfRows;
+        this.numberOfColumns = numberOfColumns;
+        this.pixelBlockWidth = pixelBlockWidth;
+        this.pixelBlockHeight = pixelBlockHeight;
+        this.numberOfPlayers = numberOfPlayers;
+        this.aPlayers = playerArray;
+        this.totalPlayerMovements = 0;
+        this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
+        this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+        originalPlayersLocation = new Player[numberOfPlayers];
+
+        clonePlayers(playerArray);
+    }
+
     /**
      * Creates players at RANDOM locations on the board using Player objects and stores them in an array
      */
@@ -198,6 +218,28 @@ public class BoardController
     }
 
     /**
+     * Checks if a player is located on the same X/Y values as other players in the Array
+     *
+     * @param playerArray Player[]
+     * @param somePlayer  Player
+     * @return Boolean
+     */
+    public static boolean playerConflict(Player[] playerArray, Player somePlayer)
+    {
+        for (Player aPlayer : playerArray)
+        {
+            if (aPlayer != null)
+            {
+                if (aPlayer.equals(somePlayer))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Draws all the previous and current conflict on the board
      */
     public void drawConflict(ShapeRenderer aRenderer)
@@ -230,6 +272,32 @@ public class BoardController
         game.medievalFont.draw(game.batch, "Press R to Reset", game.camera.viewportWidth - 250, 75);
 
         game.medievalFont.draw(game.batch, "ESC to exit", 0, 75);
+    }
+
+    public void clonePlayers(Player[] playerArray) throws CloneNotSupportedException
+    {
+        for (int i = 0; i < playerArray.length; i++)
+        {
+            Player clonedPlayer = (Player) playerArray[i].clone();
+            originalPlayersLocation[i] = clonedPlayer;
+        }
+    }
+
+    public Player createPlayer(float xLoc, float yLoc)
+    {
+        int xArrayLocation = (int) ((numberOfColumns * pixelBlockWidth) / xLoc);
+        int yArrayLocation = (int) ((numberOfRows * pixelBlockHeight) / xLoc);
+
+        Player newPlayer = new Player(xArrayLocation, yArrayLocation, Color.RED, pixelBlockWidth, pixelBlockHeight, "name");
+        return newPlayer;
+    }
+
+    public void setPlayersToOriginalLocation() throws CloneNotSupportedException
+    {
+        for (int i = 0; i < aPlayers.length; i++)
+        {
+            aPlayers[i] = (Player) originalPlayersLocation[i].clone();
+        }
     }
 
     /**
@@ -330,10 +398,6 @@ public class BoardController
         }
     }
 
-    public void drawPlayerText(SpriteBatch batch) {
-        for (Player somePlayer : aPlayers)
-        {
-            somePlayer.drawText(game.playerFont, batch);
         }
     }
 

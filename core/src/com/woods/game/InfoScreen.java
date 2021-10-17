@@ -2,153 +2,127 @@ package com.woods.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class InfoScreen implements Screen {
+public class InfoScreen implements Screen, Menu
+{
 
-    Stage someStage;
-    Woods aGame;
-    Screen returnScreen;
-
-    OrthographicCamera camera;
-    Viewport aViewport;
-    SpriteBatch aBatch;
-
-    float animationStatetime;
-
-    BitmapFont aFont;
-    Table rootTable;
-    TextField.TextFieldStyle rowStyle;
-    Button backButton;
-    Button.ButtonStyle buttonStyle;
-    Texture backTexture;
-    Background raindropsBackground;
-    Music forestMusic;
-
-
-    final float WORLD_WIDTH = 100;
-    final float WORLD_HEIGHT = 100;
-    public InfoScreen(Woods aGame, Screen returnScreen)
+    public enum State
     {
-        this.returnScreen = returnScreen;
-        this.aGame = aGame;
-
-        this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
-        this.forestMusic.setLooping(true);
-
-        this.aFont = new BitmapFont();
-        this.aBatch = new SpriteBatch();
-
-        this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
-        camera.setToOrtho(false);
-        aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
-        aViewport.apply();
-
-        someStage = new Stage(aViewport);
-
-        animationStatetime = 0f;
-
-        raindropsBackground = new Background(aGame.backgroundTextures, 30, .05f, camera, 4, 4);
-
-        buttonStyle = new Button.ButtonStyle();
-        backTexture = new Texture(Gdx.files.internal("back.png"));
-        buttonStyle.up = new TextureRegionDrawable(backTexture);
-        buttonStyle.over = new TextureRegionDrawable(backTexture).tint(Color.CYAN);
-        backButton = new Button(buttonStyle);
-        backButton.setHeight(50);
-        backButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
-
-        Texture slantedTreeTexture = aGame.menuTextures.get("SlantedTree");
-        Image slantedTreeImage = new Image(slantedTreeTexture);
-        slantedTreeImage.setSize(300, 300);
-        slantedTreeImage.setX(camera.viewportWidth-400);
-        slantedTreeImage.setY(camera.viewportHeight-450);
-
-        rowStyle = new TextField.TextFieldStyle();
-        rowStyle.font = aGame.medievalFont;
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = aGame.medievalFont;
-
-        rowStyle.fontColor = Color.WHITE;
-        Label welcome = new Label("Welcome to Wandering Woods", labelStyle);
-
-        Label labelKTo2 = new Label("K-2 Simulation:",labelStyle);
-        labelKTo2.setAlignment(Align.topRight);
-
-        Label textKTo2 = new Label("K-2 Description... Has really long text description that spans to the " +
-                "second row and wraps as it should", labelStyle);
-        textKTo2.setWrap(true);
-        textKTo2.setAlignment(Align.topLeft);
-
-        Label label3To5 = new Label("3-5 Simulation:",labelStyle);
-        label3To5.setAlignment(Align.topRight);
-
-        Label text3To5 = new Label("3-5 Description... Has really long text description that spans to the " +
-                "second row and wraps as it should", labelStyle);
-        text3To5.setWrap(true);
-        text3To5.setAlignment(Align.topLeft);
-
-
-        Label label6To8 = new Label("6-8 Simulation:",labelStyle);
-        label6To8.setAlignment(Align.topRight);
-
-        Label text6To8 = new Label("6-8 Description... Has really long text description that spans to the " +
-                "second row and wraps as it should", labelStyle);
-        text6To8.setWrap(true);
-        text6To8.setAlignment(Align.topLeft);
-
-        rootTable = new Table();
-        rootTable.setFillParent(true);
-        rootTable.row().padBottom(20);
-
-        rootTable.add(welcome).expandX().colspan(2);
-        rootTable.row().padBottom(20).padRight(75); //Adds a new row
-        rootTable.add(labelKTo2).padRight(20).width(camera.viewportWidth*1/4).top().right();
-        rootTable.add(textKTo2).width(camera.viewportWidth*3/4).top().left();
-        rootTable.row().padBottom(20).padRight(75); //Adds a new row
-        rootTable.add(label3To5).padRight(20).width(camera.viewportWidth*1/4).top().right();
-        rootTable.add(text3To5).width(camera.viewportWidth*3/4).top().left();
-        rootTable.row().padBottom(20).padRight(75); //Adds a new row
-        rootTable.add(label6To8).padRight(20).width(camera.viewportWidth*1/4).top().right();
-        rootTable.add(text6To8).width(camera.viewportWidth*3/4).top().left();
-
-        backButton.setWidth((float) backTexture.getWidth() / 4);
-        backButton.setHeight((float) backTexture.getHeight() / 5);
-
-        someStage.addActor(slantedTreeImage);
-        someStage.addActor(rootTable);
-        someStage.addActor(backButton);
+        PAUSE,
+        RUN,
+        RESUME,
+        STOPPED,
+        FOUND,
+        SELECTION,
+        K2,
+        INFO,
+        THREE_TO_FIVE
     }
 
-    @Override
-    public void show()
+    Stage backGroundStage, uiStage;
+    Woods aGame;
+    Screen returnScreen;
+    float animationStatetime;
+    Label gameInfoLabel, kindergartenLabel, threeToFiveLabel;
+
+    Button backButton, infoButton, kindergartenInfoButton, okayButton, threeToFiveInfoButton;
+    Background raindropsBackground;
+    MenuController aMenuController;
+    Board screenDimensions;
+    Group treeGroupBackground; //Just used for background tree images
+    Group uiButtons, gradeButtons, gradeInfoGroup, standardInfoGroup;
+    State gameState;
+
+
+    final float WORLD_WIDTH = 50;
+    final float WORLD_HEIGHT = 50;
+
+    public InfoScreen(Woods aGame, Screen returnScreen)
     {
-        Gdx.input.setInputProcessor(someStage);
-        aGame.forestMusic.play();
-        aGame.forestMusic.setVolume(0.1f);
-        createListeners();
+        this.gameState = State.INFO; //Default state
+        this.returnScreen = returnScreen;
+        this.aGame = aGame;
+        this.animationStatetime = 0;
+        this.screenDimensions = new Board((int) WORLD_HEIGHT, (int) WORLD_WIDTH,
+                aGame.camera.viewportWidth / WORLD_WIDTH, aGame.camera.viewportHeight / WORLD_HEIGHT);
+        backGroundStage = new Stage(aGame.aViewport);
+        uiStage = new Stage(aGame.aViewport);
+        aMenuController = new MenuController(aGame, returnScreen);
+        uiButtons = new Group();
+        gradeButtons = new Group();
+        gradeInfoGroup = new Group();
+        addButtons();
+        addLabels();
+        addButtons();
+        addBackground();
+        assembleMenu();
+
     }
 
     /**
-     * Creates listeners for the various textfields and buttons
+     * Removes game info label according to the game state
      */
-    private void createListeners()
+    private void removeLabelGroup()
     {
+        if (gameState == State.K2)
+        {
+            gradeInfoGroup.removeActor(kindergartenLabel);
+        } else if (gameState == State.THREE_TO_FIVE)
+        {
+            gradeInfoGroup.removeActor(threeToFiveLabel);
+        }
+    }
 
-        //This button will exit the game in the main menu
+    @Override
+    public void addBackground()
+    {
+        raindropsBackground = aMenuController.getRainDropsBackground();
+        treeGroupBackground = aMenuController.getBackgroundTreeImageGroup();
+    }
+
+    @Override
+    public void addButtons()
+    {
+        okayButton = aMenuController.getOkayButton();
+        backButton = aMenuController.getBackButton();
+        kindergartenInfoButton = aMenuController.getImageOfBunny();
+        threeToFiveInfoButton = aMenuController.getImageOfPig();
+        gradeButtons.addActor(kindergartenInfoButton);
+        gradeButtons.addActor(threeToFiveInfoButton);
+
+        infoButton = aMenuController.getInfoButton();
+        infoButton.setSize(screenDimensions.blockPixelWidth * 10,
+                screenDimensions.blockPixelHeight * 8);
+        infoButton.setX(screenDimensions.blockPixelWidth * 25 - infoButton.getWidth());
+        infoButton.setY(screenDimensions.blockPixelHeight * 49 - infoButton.getHeight());
+
+        okayButton.setSize(screenDimensions.blockPixelWidth * 10,
+                screenDimensions.blockPixelHeight * 8);
+        okayButton.setX(screenDimensions.blockPixelWidth * 48 - okayButton.getWidth());
+        okayButton.setY(screenDimensions.blockPixelHeight * 28);
+    }
+
+    @Override
+    public void assembleMenu()
+    {
+        gradeInfoGroup.addActor(gameInfoLabel);
+        uiButtons.addActor(gradeButtons);
+        uiStage.addActor(backButton);
+        uiStage.addActor(gradeInfoGroup);
+        uiStage.addActor(uiButtons);
+        backGroundStage.addActor(treeGroupBackground);
+        backGroundStage.addActor(infoButton);
+    }
+
+    @Override
+    public void addListeners()
+    {
         backButton.addListener(new ChangeListener()
         {
             @Override
@@ -158,7 +132,84 @@ public class InfoScreen implements Screen {
             }
         });
 
+        kindergartenInfoButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                removeLabelGroup();
+                gameState = State.K2;
+                gradeInfoGroup.addActor(kindergartenLabel);
+                gradeInfoGroup.removeActor(gameInfoLabel);
+                gradeButtons.addActor(okayButton);
+            }
+        });
 
+        threeToFiveInfoButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                removeLabelGroup();
+                gameState = State.THREE_TO_FIVE;
+                gradeInfoGroup.removeActor(gameInfoLabel);
+                gradeButtons.addActor(okayButton);
+                gradeInfoGroup.addActor(threeToFiveLabel);
+            }
+        });
+
+        okayButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                gradeInfoGroup.addActor(gameInfoLabel);
+                removeLabelGroup();
+                gameState = State.INFO;
+                gradeButtons.removeActor(okayButton);
+            }
+        });
+    }
+
+    @Override
+    public void addLabels()
+    {
+        gameInfoLabel = aMenuController.getGameInfoLabel();
+        gameInfoLabel.setPosition(screenDimensions.blockPixelWidth * 5,
+                screenDimensions.blockPixelHeight * 25);
+        kindergartenLabel = aMenuController.getK2InfoLabel();
+        kindergartenLabel.setPosition(screenDimensions.blockPixelWidth * 5,
+                screenDimensions.blockPixelHeight * 25);
+        threeToFiveLabel = aMenuController.getThreeToFiveInfoLabel();
+        threeToFiveLabel.setPosition(screenDimensions.blockPixelWidth * 5,
+                screenDimensions.blockPixelHeight * 25);
+    }
+
+    @Override
+    public void addTextFields()
+    {
+
+    }
+
+    @Override
+    public boolean removeLabels()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean removeListeners()
+    {
+        return false;
+    }
+
+    @Override
+    public void show()
+    {
+        Gdx.input.setInputProcessor(uiStage); //Sets which stage the 'Listeners' will activate on
+        aGame.forestMusic.play();
+        aGame.forestMusic.setVolume(0.1f);
+        addListeners();
     }
 
     /**
@@ -171,37 +222,57 @@ public class InfoScreen implements Screen {
     {
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        camera.update();
-        aBatch.setProjectionMatrix(camera.combined);
-        raindropsBackground.draw(aBatch, animationStatetime += delta);
-        someStage.act();
-        someStage.draw();
+        aGame.camera.update();
+        aGame.batch.setProjectionMatrix(aGame.camera.combined);
+        raindropsBackground.draw(aGame.batch, animationStatetime += delta);
+        backGroundStage.act();
+        backGroundStage.draw();
+
+        uiStage.act();
+        uiStage.draw();
+
+        update();
+    }
+
+    private void update()
+    {
+        if (gameState == State.INFO)
+        {
+
+        }
     }
 
     @Override
-    public void resize(int width, int height) {
-        someStage.getViewport().update(width, height);
-        this.aViewport.update(width, height);
+    public void resize(int width, int height)
+    {
+        uiStage.getViewport().update(width, height);
+        backGroundStage.getViewport().update(width, height);
+        screenDimensions = new Board(50, 50,
+                (float) width / 50, (float) height / 50);
+        this.aGame.aViewport.update(width, height);
     }
 
     @Override
-    public void pause() {
+    public void pause()
+    {
         aGame.forestMusic.stop();
     }
 
     @Override
-    public void resume() {
+    public void resume()
+    {
         aGame.forestMusic.play();
     }
 
     @Override
-    public void hide() {
-        aGame.forestMusic.stop();
+    public void hide()
+    {
+
     }
 
     @Override
-    public void dispose() {
-        forestMusic.dispose();
+    public void dispose()
+    {
         aGame.forestMusic.stop();
     }
 
