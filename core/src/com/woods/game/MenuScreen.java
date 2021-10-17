@@ -60,13 +60,13 @@ public class MenuScreen implements Screen, Menu
         this.camera = game.camera;
         this.rootTable = new Table();
         camera.setToOrtho(false);
-        aViewport = game.aViewport;
-        aViewport.apply();
+        //aViewport = game.aViewport;
+        //aViewport.apply();
         aBoard = new Board(50, 50, camera.viewportWidth / 50,
                 camera.viewportHeight / 50);
 
-        stageUI = new Stage(aViewport);
-        backgroundStage = new Stage(aViewport);
+        stageUI = new Stage(game.aViewport);
+        backgroundStage = new Stage(game.aViewport);
 
         this.columns = 10;
         this.rows = 10;
@@ -211,7 +211,7 @@ public class MenuScreen implements Screen, Menu
         animationStatetime += Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
-        aBatch.setProjectionMatrix(camera.combined);
+        aBatch.setProjectionMatrix(game.camera.combined);
         raindropsBackground.draw(aBatch, animationStatetime);
 
         backgroundStage.act();
@@ -238,8 +238,7 @@ public class MenuScreen implements Screen, Menu
     @Override
     public void resize(int width, int height)
     {
-        stageUI.getViewport().update(width, height);
-        this.aViewport.update(width, height);
+        game.aViewport.update(width, height);
     }
 
     @Override

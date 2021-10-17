@@ -17,9 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import org.w3c.dom.Text;
+import com.badlogic.gdx.utils.viewport.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,9 +69,9 @@ public class Woods extends Game
         menuTextures = new HashMap<>();
         textFields = new HashMap<>();
         boardTextures = new Texture[10];
-        this.camera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT); //Sets the game size, the full width/height is the entire length in pixels
-        camera.setToOrtho(false);
-        aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
+        this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //Sets the game size, the full width/height is the entire length in pixels
+        camera.setToOrtho(true);
+        aViewport = new ScreenViewport();
         aViewport.apply();
 
         addTextures();
@@ -143,6 +141,8 @@ public class Woods extends Game
         menuTextures.put("Pig", new Texture(Gdx.files.internal("pig.png")));
         menuTextures.put("Back", new Texture(Gdx.files.internal("back.png")));
         menuTextures.put("Okay", new Texture(Gdx.files.internal("okay2.png")));
+        menuTextures.put("Select", new Texture(Gdx.files.internal("select2.png")));
+        menuTextures.put("Normal", new Texture(Gdx.files.internal("normal.png")));
 
         boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
         boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
@@ -154,6 +154,7 @@ public class Woods extends Game
         boardTextures[7] = new Texture(Gdx.files.internal("Tree_Pine_Snow_02.png"), true);
         boardTextures[8] = new Texture(Gdx.files.internal("Tree_Pine_Snow_03.png"), true);
         boardTextures[9] = new Texture(Gdx.files.internal("Tree_Pine_Snow_04.png"), true);
+
 
         for (int i = 0; i < boardTextures.length; i++)
         {

@@ -12,8 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import javax.swing.*;
-
 /**
  * Selection screen for the students BETWEEN kindergarten and 6-8
  */
@@ -27,15 +25,17 @@ public class MiddleScreen implements Screen, Menu
         RESUME,
         STOPPED,
         FOUND,
-        SELECTION
+        SELECTION,
+        RANDOM,
+        DEFAULT
     }
 
-    MiddleScreen aMiddleScreen;
+    MiddleScreen returnScreen;
     State gameState; //Used for setting the state of the game, paused, running, selection screen...etc
-    Group labelGroup, textFieldGroup, buttonSelectionGroup, imageGroup, warningGroup, backgroundGroup;
+    Group labelGroup, textFieldGroup, defaultButtons, imageGroup, warningGroup, backgroundGroup;
     TextField rowTextField, colTextField, playerTextField;
-    Button exitButton, startButton;
-    Label rowLabel, colLabel, playerLabel;
+    Button exitButton, startButton, selectButton, normalButton;
+    Label rowLabel, colLabel, playerLabel, selectModeLabel;
 
     final Woods game;
     final MenuScreen aMenuScreen;
@@ -48,10 +48,12 @@ public class MiddleScreen implements Screen, Menu
     Background rainDropsBackground;
     float animationStateTime;
     int rows, columns, players;
+    ButtonGroup<Button> buttonGroup;
+
 
     public MiddleScreen(Woods game, MenuScreen aMenuScreen, int rows, int columns)
     {
-        aMiddleScreen = this;
+        this.returnScreen = this;
         this.rows = 10; //Default rows
         this.columns = 10; //Default columns
         this.players = 4; //Default Players
@@ -68,16 +70,20 @@ public class MiddleScreen implements Screen, Menu
         aMenuController = new MenuController(game, this);
         labelGroup = new Group();
         textFieldGroup = new Group();
-        buttonSelectionGroup = new Group();
+        defaultButtons = new Group();
         backgroundGroup = new Group();
         warningGroup = new Group();
+        buttonGroup = new ButtonGroup<>();
+        buttonGroup.setMaxCheckCount(1);
+        buttonGroup.uncheckAll();
+
         addBackground();
         addButtons();
         addTextFields();
         addLabels();
         assembleMenu();
 
-        gameState = State.SELECTION;
+        gameState = State.DEFAULT;
         //aBoardController = new BoardController(game, rows, columns, game.camera.viewportWidth / columns, game.camera.viewportHeight / rows);
     }
 
@@ -87,6 +93,9 @@ public class MiddleScreen implements Screen, Menu
         rowLabel = aMenuController.getRowLabel();
         colLabel = aMenuController.getColumnLabel();
         playerLabel = aMenuController.getPlayerLabel();
+        selectModeLabel = aMenuController.getSelectModeLabel();
+
+        labelGroup.addActor(selectModeLabel);
         labelGroup.addActor(rowLabel);
         labelGroup.addActor(colLabel);
         labelGroup.addActor(playerLabel);
@@ -114,8 +123,19 @@ public class MiddleScreen implements Screen, Menu
     {
         startButton = aMenuController.getStartButton();
         exitButton = aMenuController.getExitButton();
-        buttonSelectionGroup.addActor(exitButton);
-        buttonSelectionGroup.addActor(startButton);
+        selectButton = aMenuController.getSelectButton();
+        normalButton = aMenuController.getNormalButton();
+
+        Table buttonTable = new Table();
+        buttonTable.add(normalButton, selectButton);
+
+        buttonGroup.add(selectButton);
+        buttonGroup.add(normalButton);
+        buttonGroup.uncheckAll();
+        defaultButtons.addActor(normalButton);
+        defaultButtons.addActor(exitButton);
+        defaultButtons.addActor(startButton);
+        defaultButtons.addActor(selectButton);
     }
 
     @Override
@@ -123,7 +143,7 @@ public class MiddleScreen implements Screen, Menu
     {
         backgroundStage.addActor(backgroundGroup);
         uiStage.addActor(textFieldGroup);
-        uiStage.addActor(buttonSelectionGroup);
+        uiStage.addActor(defaultButtons);
         uiStage.addActor(labelGroup);
         uiStage.addActor(exitButton);
     }
@@ -192,8 +212,17 @@ public class MiddleScreen implements Screen, Menu
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, aMiddleScreen, rows, columns, players));
+                Button aButton = buttonGroup.getChecked();
+
+                if (aButton == normalButton)
+                {
+                    game.setScreen(new BoardScreen(game, returnScreen, rows, columns, players));
+                }
+                else
+                {
+                    game.setScreen(new SelectionScreen(game, returnScreen, rows, columns, players));
+                }
+
             }
         });
 
@@ -230,6 +259,31 @@ public class MiddleScreen implements Screen, Menu
                 }
             }
         });
+
+        selectButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+
+            }
+        });
+
+        /*selectButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                if (gameState == State.DEFAULT)
+                {
+                    gameState = State.SELECTION;
+                }
+                else
+                {
+                    gameState = State.DEFAULT;
+                }
+            }
+        });*/
     }
 
     @Override
@@ -277,7 +331,7 @@ public class MiddleScreen implements Screen, Menu
 
     private void addButtonsToStage()
     {
-        uiStage.addActor(buttonSelectionGroup);
+        uiStage.addActor(defaultButtons);
     }
 
     private void addImagesToStage()

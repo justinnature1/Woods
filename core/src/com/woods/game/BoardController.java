@@ -25,6 +25,7 @@ public class BoardController
     float pixelBlockHeight;
     int numberOfPlayers;
     Player[] aPlayers;
+    Player[] originalPlayersLocation;
     String[] playerNames = {"Joel", "Chris", "Mary", "Lyra"};
     int totalPlayerMovements;
     float average;
@@ -37,14 +38,6 @@ public class BoardController
 
     public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers)
     {
-        /*if (numberOfRows < 5 || numberOfColumns < 5)
-        {
-            throw new IllegalArgumentException("Number of rows or number of columns must be above 9");
-        }
-        if (numberOfPlayers < 2)
-        {
-            throw new IllegalArgumentException("Number of players must be above 1");
-        }*/
         this.game = aGame;
         this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
@@ -58,6 +51,27 @@ public class BoardController
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+    }
+
+    public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers,
+                           Player[] playerArray) throws CloneNotSupportedException
+    {
+        this.game = aGame;
+        this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
+        this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
+        this.collidedLocations = new ArrayList<>();
+        this.numberOfRows = numberOfRows;
+        this.numberOfColumns = numberOfColumns;
+        this.pixelBlockWidth = pixelBlockWidth;
+        this.pixelBlockHeight = pixelBlockHeight;
+        this.numberOfPlayers = numberOfPlayers;
+        this.aPlayers = playerArray;
+        this.totalPlayerMovements = 0;
+        this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
+        this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+        originalPlayersLocation = new Player[numberOfPlayers];
+
+        clonePlayers(playerArray);
     }
 
     /**
@@ -161,6 +175,28 @@ public class BoardController
     }
 
     /**
+     * Checks if a player is located on the same X/Y values as other players in the Array
+     *
+     * @param playerArray Player[]
+     * @param somePlayer  Player
+     * @return Boolean
+     */
+    public static boolean playerConflict(Player[] playerArray, Player somePlayer)
+    {
+        for (Player aPlayer : playerArray)
+        {
+            if (aPlayer != null)
+            {
+                if (aPlayer.equals(somePlayer))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Draws all the previous and current conflict on the board
      */
     public void drawConflict(ShapeRenderer aRenderer)
@@ -188,6 +224,32 @@ public class BoardController
         game.medievalFont.draw(game.batch, "Press R to Reset", game.camera.viewportWidth - 250, 75);
 
         game.medievalFont.draw(game.batch, "ESC to exit", 0, 75);
+    }
+
+    public void clonePlayers(Player[] playerArray) throws CloneNotSupportedException
+    {
+        for (int i = 0; i < playerArray.length; i++)
+        {
+            Player clonedPlayer = (Player) playerArray[i].clone();
+            originalPlayersLocation[i] = clonedPlayer;
+        }
+    }
+
+    public Player createPlayer(float xLoc, float yLoc)
+    {
+        int xArrayLocation = (int) ((numberOfColumns * pixelBlockWidth) / xLoc);
+        int yArrayLocation = (int) ((numberOfRows * pixelBlockHeight) / xLoc);
+
+        Player newPlayer = new Player(xArrayLocation, yArrayLocation, Color.RED, pixelBlockWidth, pixelBlockHeight, "name");
+        return newPlayer;
+    }
+
+    public void setPlayersToOriginalLocation() throws CloneNotSupportedException
+    {
+        for (int i = 0; i < aPlayers.length; i++)
+        {
+            aPlayers[i] = (Player) originalPlayersLocation[i].clone();
+        }
     }
 
     /**
@@ -227,7 +289,7 @@ public class BoardController
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
                 arrayTextureIndex = aRan.nextInt(10);
-                aTexture = textureArray[arrayTextureIndex]; //Too many different textures on large super large boards will slow down HTML build, GWT is slow
+                aTexture = textureArray[4]; //Too many different textures on large super large boards will slow down HTML build, GWT is slow
 
                 aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
                 aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
@@ -285,6 +347,23 @@ public class BoardController
         for (Player somePlayer : aPlayers)
         {
             somePlayer.draw(renderer);
+        }
+    }
+
+    /**
+     * Use this to draw selected players on SelectionScreen
+     *
+     * @param renderer ShapeRenderer
+     * @param players  Player[]
+     */
+    public static void drawPlayers(ShapeRenderer renderer, Player[] players)
+    {
+        for (Player somePlayer : players)
+        {
+            if (somePlayer != null)
+            {
+                somePlayer.draw(renderer);
+            }
         }
     }
 

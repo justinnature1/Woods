@@ -67,8 +67,9 @@ public class KindergartenGamePlayBoard implements Screen
         this.aShape = new ShapeRenderer();
         theCamera = aScreen.camera;
         aViewport = aScreen.aViewport;
-        this.uiStage = new Stage(aViewport);
+        this.uiStage = new Stage(aGame.aViewport);
         this.someSkin = new Skin();
+        game.camera.setToOrtho(false);
 
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;

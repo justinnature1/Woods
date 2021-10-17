@@ -34,10 +34,10 @@ public class MenuController
     private TextField rowTextField;
     private TextField colTextField;
     private TextField playerTextField;
-    private Button exitButton, startButton, infoButton, backButton, okayButton;
+    private Button exitButton, startButton, infoButton, backButton, okayButton, selectButton, normalButton;
     private ImageTextButton imageOfBunny, imageOfPig;
     private Label welcomeLabel, rowLabel, columnLabel, playerLabel, gameInfoLabel, k2InfoLabel,
-            threeToFiveInfoLabel;
+            threeToFiveInfoLabel, selectModeLabel;
 
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
@@ -77,6 +77,10 @@ public class MenuController
         rowLabel = new Label("Rows: ", someSkin);
         columnLabel = new Label("Columns: ", someSkin);
         playerLabel = new Label("Number of Players: ", someSkin);
+        selectModeLabel = new Label("Press Select to choose starting spots " +
+                "or choose Normal for standard spots", someSkin);
+        selectModeLabel.setPosition(screenDimensions.blockPixelWidth * 5,
+                screenDimensions.blockPixelHeight * 30);
 
         Label.LabelStyle gameInfoStyleLabel = new Label.LabelStyle();
         gameInfoStyleLabel.font = game.medievalFont;
@@ -289,6 +293,34 @@ public class MenuController
         exitButton.setHeight((float) exitTexture.getHeight() / 3);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
+        Button.ButtonStyle normalButtonStyle = new Button.ButtonStyle();
+        Texture normalTexture = game.menuTextures.get("Normal");
+        someSkin.add("normal", normalTexture);
+        TextureRegion normalRegion = new TextureRegion(normalTexture);
+        normalButtonStyle.up = new TextureRegionDrawable(normalRegion);
+        normalButtonStyle.over = someSkin.newDrawable("normal", Color.CORAL);
+        normalButtonStyle.checked = someSkin.newDrawable("normal", Color.GRAY);
+        normalButton = new Button(normalButtonStyle);
+        normalButton.setWidth(screenDimensions.blockPixelWidth * 5);
+        normalButton.setHeight(screenDimensions.blockPixelHeight * 4);
+        normalButton.setX(screenDimensions.blockPixelWidth * 25);
+        normalButton.setY(screenDimensions.blockPixelHeight * 9);
+
+        Button.ButtonStyle selectButtonStyle = new Button.ButtonStyle();
+        Texture selectTexture = game.menuTextures.get("Select");
+        someSkin.add("select", selectTexture);
+        TextureRegion selectRegion = new TextureRegion(selectTexture);
+        selectButtonStyle.up = new TextureRegionDrawable(selectRegion);
+        selectButtonStyle.over = someSkin.newDrawable("select", Color.CORAL);
+        selectButtonStyle.checked = someSkin.newDrawable("select", Color.DARK_GRAY);
+        selectButton = new Button(selectButtonStyle);
+        selectButton.setWidth((float) selectTexture.getWidth() / 3);
+        selectButton.setHeight((float) selectTexture.getHeight() / 3);
+        selectButton.setX(screenDimensions.blockPixelWidth * 20);
+        selectButton.setY(screenDimensions.blockPixelHeight * 9);
+        selectButton.setColor(Color.BLUE);
+
+
         Button.ButtonStyle startButtonStyle = new Button.ButtonStyle();
         Texture startTexture = game.menuTextures.get("Start");
         someSkin.add("start", startTexture);
@@ -299,8 +331,8 @@ public class MenuController
         startButton.setWidth((float) exitTexture.getWidth() / 2);
         startButton.setHeight((float) exitTexture.getHeight() / 2);
         startButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.9f);
-        startButton.setX(screenDimensions.blockPixelWidth * WORLD_WIDTH / 2);
-        startButton.setY(screenDimensions.blockPixelHeight * 10);
+        startButton.setX(screenDimensions.blockPixelWidth * 22);
+        startButton.setY(screenDimensions.blockPixelHeight * 5);
 
         Button.ButtonStyle infoButtonStyle = new Button.ButtonStyle();
         Texture infoTexture = game.menuTextures.get("Info");
@@ -327,7 +359,6 @@ public class MenuController
         imageOfBunny.setX(5 * screenDimensions.blockPixelWidth);
         imageOfBunny.setY(8 * screenDimensions.blockPixelHeight);
         imageOfBunny.setSize(300, 200);
-
 
         Texture pigTexture = game.menuTextures.get("Pig");
         TextureRegion pigRegion = new TextureRegion(pigTexture);
@@ -601,5 +632,20 @@ public class MenuController
     public Label getThreeToFiveInfoLabel()
     {
         return threeToFiveInfoLabel;
+    }
+
+    public Button getSelectButton()
+    {
+        return selectButton;
+    }
+
+    public Button getNormalButton()
+    {
+        return normalButton;
+    }
+
+    public Label getSelectModeLabel()
+    {
+        return selectModeLabel;
     }
 }

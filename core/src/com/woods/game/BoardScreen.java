@@ -39,7 +39,13 @@ public class BoardScreen implements Screen
         RUN,
         RESUME,
         STOPPED,
-        FOUND
+        FOUND,
+    }
+
+    public enum SelectionState
+    {
+        SELECT,
+        DEFAULT
     }
 
     OrthographicCamera theCamera;
@@ -49,8 +55,10 @@ public class BoardScreen implements Screen
     Woods game;
     ShapeRenderer aShape;
     int rows, columns, players;
+    Player[] playerArray;
     Screen aScreen;
     State stateOfGame;
+    SelectionState selectState;
     Stage uiStage;
 
     Button resetButton;
@@ -64,10 +72,74 @@ public class BoardScreen implements Screen
 
     BitmapFont arrowKeyFont;
 
+    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int players, Player[] playerArray) throws CloneNotSupportedException
+    {
+        this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
+
+        this.playerArray = playerArray;
+        this.aScreen = aScreen;
+        this.game = aGame;
+        this.rows = rows;
+        this.columns = columns;
+        this.aShape = new ShapeRenderer();
+        theCamera = aGame.camera;
+        aViewport = aGame.aViewport;
+        this.uiStage = new Stage(aViewport);
+        someSkin = new Skin();
+
+        int rightSideBuffer = 0;
+        int bottomEdgeBuffer = 0;
+
+        //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
+        aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, players, playerArray);
+
+        aBoardController.createArrayOfTextures(aGame.boardTextures);
+
+        Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
+        Texture exitTexture = game.menuTextures.get("Exit");
+        someSkin.add("exit", exitTexture);
+        TextureRegion exitRegion = new TextureRegion(exitTexture);
+        exitButtonStyle.up = new TextureRegionDrawable(exitRegion);
+        exitButtonStyle.over = someSkin.newDrawable("exit", Color.CORAL);
+        exitButton = new Button(exitButtonStyle);
+        exitButton.setWidth((float) exitTexture.getWidth() / 4);
+        exitButton.setHeight((float) exitTexture.getHeight() / 4);
+        exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
+
+        stateOfGame = State.RUN;
+        selectState = SelectionState.SELECT;
+        resetButton = game.buttons.get("reset");
+
+        uiStage.addActor(resetButton);
+        uiStage.addActor(exitButton);
+
+        this.foundFunc = new found()
+        {
+            @Override
+            public void drawCollision(SpriteBatch aBatch)
+            {
+                game.medievalFont.setColor(Color.MAGENTA.r, Color.MAGENTA.g, Color.MAGENTA.b, 1);
+                game.medievalFont.draw(game.batch, "Players found eachother!", game.camera.viewportWidth / 2, game.camera.viewportHeight / 2, 20f, 1, true);
+            }
+        };
+
+        this.statisticsFunc = new statistics()
+        {
+            @Override
+            public void drawStatistics(SpriteBatch aBatch)
+            {
+                game.monoFont.setColor(1, 1, 0, 1.3f);
+                game.medievalFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, game.camera.viewportHeight - 10);
+                game.monoFont.draw(game.batch, "Average: " + average, 50, game.camera.viewportHeight - 40);
+                game.arrowKeyFont.draw(game.batch, "Rows: " + rows, 50, game.camera.viewportHeight - 70);
+                game.arrowKeyFont.draw(game.batch, "Columns: " + columns, 50, game.camera.viewportHeight - 90);
+            }
+        };
+    }
+
     public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int players)
     {
-
-
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
 
         this.aScreen = aScreen;
@@ -102,6 +174,7 @@ public class BoardScreen implements Screen
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
         stateOfGame = State.RUN;
+        selectState = SelectionState.DEFAULT;
         resetButton = game.buttons.get("reset");
 
         uiStage.addActor(resetButton);
@@ -147,7 +220,13 @@ public class BoardScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                resetBoard();
+                try
+                {
+                    resetBoard();
+                } catch (CloneNotSupportedException e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -215,7 +294,13 @@ public class BoardScreen implements Screen
             }
         }
 
-        update();
+        try
+        {
+            update();
+        } catch (CloneNotSupportedException e)
+        {
+            e.printStackTrace();
+        }
 
         if (stateOfGame == State.FOUND)
         {
@@ -229,7 +314,7 @@ public class BoardScreen implements Screen
     /**
      * Updates the state of the game (collisions and movement) and collects keyboard input
      */
-    public void update()
+    public void update() throws CloneNotSupportedException
     {
         //TODO Write a pause text when pressing spacebar
         Input anInput = Gdx.input;
@@ -300,15 +385,25 @@ public class BoardScreen implements Screen
     /**
      * Resets the board and player location to defaults
      */
-    private void resetBoard()
+    private void resetBoard() throws CloneNotSupportedException
     {
-
+        if (selectState == SelectionState.DEFAULT)
+        {
+            aBoardController.createPlayersDefaultLocation();
+            stateOfGame = State.RUN;
+            aBoardController.totalPlayerMovements = 0;
+            aBoardController.playerUpdateTime = 0.3f;
+            this.pause();
+        }
+        else
+        {
+            aBoardController.setPlayersToOriginalLocation();
+            stateOfGame = State.RUN;
+            aBoardController.totalPlayerMovements = 0;
+            aBoardController.playerUpdateTime = 0.3f;
+            this.pause();
+        }
         //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.createPlayersDefaultLocation();
-        stateOfGame = State.RUN;
-        aBoardController.totalPlayerMovements = 0;
-        aBoardController.playerUpdateTime = 0.3f;
-        this.pause();
 
     }
 
