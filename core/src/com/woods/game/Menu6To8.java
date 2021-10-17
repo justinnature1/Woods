@@ -85,7 +85,7 @@ public class Menu6To8 implements Screen, Menu {
 
     @Override
     public void addBackground() {
-        backgroundGroup = aMenuController.getImageGroup();
+        backgroundGroup = aMenuController.getBackgroundTreeImageGroup();
     }
 
     @Override
@@ -103,6 +103,18 @@ public class Menu6To8 implements Screen, Menu {
         uiStage.addActor(buttonSelectionGroup);
         uiStage.addActor(labelGroup);
         uiStage.addActor(exitButton);
+    }
+
+    @Override
+    public boolean removeLabels()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean removeListeners()
+    {
+        return false;
     }
 
     @Override

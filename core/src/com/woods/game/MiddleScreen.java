@@ -216,7 +216,7 @@ public class MiddleScreen implements Screen, Menu
 
                 if (aButton == normalButton)
                 {
-                    game.setScreen(new BoardScreen(game, returnScreen, rows, columns, players));
+                    game.setScreen(new OldBoardScreen(game, returnScreen, rows, columns, players));
                 }
                 else
                 {

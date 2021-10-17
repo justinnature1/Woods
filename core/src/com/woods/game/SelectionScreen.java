@@ -32,9 +32,9 @@ public class SelectionScreen implements Screen, Menu
     Woods game;
     Screen returnScreen;
     int rows, columns, players, playersToSelect;
-    BoardController aBoardController;
+    OldBoardController aBoardController;
     ShapeRenderer shapeRenderer;
-    Player[] totalPlayersArray;
+    OldPlayer[] totalPlayersArray;
     State gameState;
     MenuController aMenuController;
     Button startButton, backButton;
@@ -51,10 +51,10 @@ public class SelectionScreen implements Screen, Menu
         this.rows = rows;
         this.playersToSelect = players;
         this.shapeRenderer = new ShapeRenderer();
-        aBoardController = new BoardController(game, rows, columns, game.camera.viewportWidth / columns,
+        aBoardController = new OldBoardController(game, rows, columns, game.camera.viewportWidth / columns,
                 game.camera.viewportHeight / rows, players);
         aBoardController.createArrayOfTextures(game.boardTextures);
-        this.totalPlayersArray = new Player[playersToSelect];
+        this.totalPlayersArray = new OldPlayer[playersToSelect];
         gameState = State.SELECTION;
         aMenuController = new MenuController(game, this);
         this.uiStage = new Stage(game.aViewport);
@@ -103,7 +103,7 @@ public class SelectionScreen implements Screen, Menu
             {
                 try
                 {
-                    game.setScreen(new BoardScreen(game, new SelectionScreen(game, returnScreen, rows, columns, players), rows, columns, players, totalPlayersArray));
+                    game.setScreen(new OldBoardScreen(game, new SelectionScreen(game, returnScreen, rows, columns, players), rows, columns, players, totalPlayersArray));
                 } catch (CloneNotSupportedException e)
                 {
                     e.printStackTrace();
@@ -156,7 +156,7 @@ public class SelectionScreen implements Screen, Menu
         update();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        BoardController.drawPlayers(shapeRenderer, totalPlayersArray);
+        OldBoardController.drawPlayers(shapeRenderer, totalPlayersArray);
         shapeRenderer.end();
 
         uiStage.act();
@@ -186,9 +186,9 @@ public class SelectionScreen implements Screen, Menu
             float yArrayLocation = yLoc / blockHeight;
             float xArrayLocation = xLoc / blockWidth;
 
-            Player anotherPlayerToAdd = new Player((int) xArrayLocation, (int) yArrayLocation, Color.RED, blockWidth, blockHeight, "rawrs");
+            OldPlayer anotherPlayerToAdd = new OldPlayer((int) xArrayLocation, (int) yArrayLocation, Color.RED, blockWidth, blockHeight, "rawrs");
 
-            boolean foundConflict = BoardController.playerConflict(totalPlayersArray, anotherPlayerToAdd);
+            boolean foundConflict = OldBoardController.playerConflict(totalPlayersArray, anotherPlayerToAdd);
 
             if (!foundConflict && playersToSelect > 0) //Does not find conflict, will add to total array of Players
             {

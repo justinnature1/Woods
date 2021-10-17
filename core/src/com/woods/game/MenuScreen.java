@@ -142,7 +142,7 @@ public class MenuScreen implements Screen, Menu
             public void changed(ChangeEvent event, Actor actor)
             {
                 //game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 2));
+                game.setScreen(new KindergartenGamePlayBoard(game, new MenuScreen(game), rows, columns));
             }
         });
 

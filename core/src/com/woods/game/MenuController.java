@@ -36,6 +36,11 @@ public class MenuController
     private TextField playerTextField;
 
 
+    private Button exitButton, startButton, infoButton, backButton, okayButton, selectButton, normalButton;
+    private ImageTextButton imageOfBunny, imageOfPig, imageOfCow;
+    private Label welcomeLabel, rowLabel, columnLabel, playerLabel, gameInfoLabel, k2InfoLabel,
+            threeToFiveInfoLabel, selectModeLabel;
+
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
     private Label rowWarning;
@@ -257,20 +262,12 @@ public class MenuController
             }
         };
 
-        ChangeListener startListener = new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                game.setScreen(new BoardScreen(game, aScreen, rows, columns, amountOfPlayers));
-            }
-        };
+
 
         rowTextField.setTextFieldListener(rowListener);
         colTextField.setTextFieldListener(colListener);
         playerTextField.setTextFieldListener(playersListener);
         exitButton.addListener(exitListener);
-        startButton.addListener(startListener);
     }
 
     /**
@@ -371,6 +368,43 @@ public class MenuController
         imageOfPig = new ImageTextButton("3-5", pigStyle);
         imageOfPig.setY(5 * screenDimensions.blockPixelHeight);
         imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
+
+
+
+        Button.ButtonStyle backStyle = new Button.ButtonStyle();
+        Texture backTexture = new Texture(Gdx.files.internal("back.png"));
+        backStyle.up = new TextureRegionDrawable(backTexture);
+        backStyle.over = new TextureRegionDrawable(backTexture).tint(Color.CYAN);
+        backButton = new Button(backStyle);
+        backButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        backButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
+
+        Button.ButtonStyle okayStyle = new Button.ButtonStyle();
+        Texture okayTexture = new Texture(Gdx.files.internal("okay2.png"));
+        okayStyle.up = new TextureRegionDrawable(okayTexture);
+        okayStyle.over = new TextureRegionDrawable(okayTexture).tint(Color.CYAN);
+        okayButton = new Button(okayStyle);
+        okayButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        okayButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
+
+
+        Texture cowTexture = game.menuTextures.get("Cow");
+        TextureRegion cowRegion = new TextureRegion(cowTexture);
+        ImageTextButton.ImageTextButtonStyle cowStyle = new ImageTextButton.ImageTextButtonStyle();
+        cowStyle.overFontColor = Color.RED;
+        cowStyle.fontColor = Color.BLACK;
+        cowStyle.font = game.largeFont;
+        Image cowImage = new Image(cowRegion);
+        cowImage.setSize(screenDimensions.blockPixelWidth * 5, screenDimensions.blockPixelHeight * 5);
+        cowImage.setX(25 * screenDimensions.blockPixelWidth);
+        someSkin.add("cow", cowRegion);
+        cowStyle.up = new TextureRegionDrawable(cowRegion);
+        cowStyle.over = someSkin.newDrawable("cow", Color.CORAL);
+        imageOfCow = new ImageTextButton("6-8", cowStyle);
+        imageOfCow.setY(8 * screenDimensions.blockPixelHeight);
+        imageOfCow.setX(28 * screenDimensions.blockPixelWidth);
 
     }
 
@@ -637,5 +671,10 @@ public class MenuController
     public Label getSelectModeLabel()
     {
         return selectModeLabel;
+    }
+
+    public Group getImageGroup()
+    {
+        return null;
     }
 }
