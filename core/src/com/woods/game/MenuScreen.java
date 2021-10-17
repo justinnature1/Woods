@@ -41,7 +41,7 @@ public class MenuScreen implements Screen, Menu
     Table rootTable;
     Button exitButton;
     Background raindropsBackground;
-    ImageTextButton imageOfPig, imageOfBunny, imageOfCow;
+    ImageTextButton imageOfPig, imageOfBunny;
     Music forestMusic;
     private Button infoButton;
 
@@ -117,16 +117,6 @@ public class MenuScreen implements Screen, Menu
             }
         });
 
-        imageOfCow.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                game.setScreen(new Menu6To8(game, new MenuScreen(game), 10, 10));
-                game.getScreen().pause();
-            }
-        });
-
         imageOfPig.addListener(new ChangeListener()
         {
             @Override
@@ -142,7 +132,7 @@ public class MenuScreen implements Screen, Menu
             public void changed(ChangeEvent event, Actor actor)
             {
                 //game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 2));
+                game.setScreen(new KindergartenGamePlayBoard(game, new MenuScreen(game), rows, columns));
             }
         });
 
@@ -178,10 +168,8 @@ public class MenuScreen implements Screen, Menu
         infoButton = menuControl.getInfoButton();
         imageOfBunny = menuControl.getImageOfBunny();
         imageOfPig = menuControl.getImageOfPig();
-        imageOfCow = menuControl.getImageOfCow();
         buttonGroup.addActor(imageOfPig);
         buttonGroup.addActor(imageOfBunny);
-        buttonGroup.addActor(imageOfCow);
         buttonGroup.addActor(exitButton);
         buttonGroup.addActor(infoButton);
     }
