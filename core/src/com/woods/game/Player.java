@@ -1,10 +1,13 @@
 package com.woods.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.woods.game.movement.*;
 
-import java.util.Random;
+import java.util.*;
 
 public class Player extends Block
 {
@@ -14,8 +17,14 @@ public class Player extends Block
     float radius;
     String name;
     Random aRandom;
+    Move move;
+    boolean createdByUser;
+    Queue <Move> movementQueue = new LinkedList<>();
+    Queue <Color> colorQueue = new LinkedList<>();
+    private int previousX = 0;
+    private int previousY = 0;
 
-    public Player(int xArrayLocation, int yArrayLocation, Color aColor, float width, float height, String name)
+    public Player(int xArrayLocation, int yArrayLocation, Color aColor, float width, float height, boolean createdByUser)
     {
         super(xArrayLocation, yArrayLocation, aColor);
         this.width = width;
@@ -30,10 +39,33 @@ public class Player extends Block
             this.radius = width / 2;
         }
 
-        this.name = name;
-        this.aRandom = new Random();
+        createQueues(5);
+
+        this.createdByUser = createdByUser;
+        this.move = new Wander(this); //Create Players that begin moving the normal way
         //Rectangle aRect = new Rectangle((int)x, (int)y, (int)width, (int)height);
     }
+
+    /**
+     * Creates a clone of the player.
+     * @param playerToClone
+     */
+    public Player(Player playerToClone) {
+        super(playerToClone.xArrayLocation, playerToClone.yArrayLocation, playerToClone.color);
+        this.width = playerToClone.width;
+        this.height = playerToClone.height;
+        this.radius = playerToClone.radius;
+        this.name = playerToClone.name;
+        this.createdByUser = playerToClone.createdByUser;
+        try{
+            this.move = playerToClone.move.getClass().getConstructor(Player.class).newInstance(this);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            this.move = new Wander(this);
+        }
+        createQueues(playerToClone.movementQueue.size());
+    }
+
 
     /**
      * Moves player location, based on x/y coordinate. Will attempt to move Up/Right/Down/Left/Diagonally at random
@@ -42,77 +74,65 @@ public class Player extends Block
      * @param columns int Number of Columns in board
      * @return
      */
-    public boolean playerMovement(int rows, int columns)
+    public void playerMovement(int rows, int columns)
     {
-        boolean playerMoved = false;
-        int xVector = 0;
-        int yVector = 0;
+        this.previousX = getxArrayLocation();
+        this.previousY = getyArrayLocation();
+        move.move(rows, columns);
+    }
 
-        int direction = aRandom.nextInt(8);
-
-        switch (direction)
-        {
-            //North
-            case 0:
-                yVector = -1;
-                break;
-            case 1:
-                //East
-                xVector = 1;
-                break;
-            case 2:
-                //South
-                yVector = 1;
-                break;
-            case 3:
-                //West
-                xVector = -1;
-                break;
-            case 4:
-                //NorthEast
-                xVector = 1;
-                yVector = -1;
-                break;
+    public void createQueues(int queueSize){
+        switch (queueSize){
             case 5:
-                //NorthWest
-                xVector = -1;
-                yVector = -1;
-                break;
-            case 6:
-                //SouthEast
-                xVector = 1;
-                yVector = 1;
-                break;
-            case 7:
-                //SouthWest
-                xVector = -1;
-                yVector = 1;
-                break;
+                movementQueue.add(new Row(this));
+                colorQueue.add(Color.ORANGE);
+            case 4:
+                movementQueue.add(new Column(this));
+                colorQueue.add(Color.YELLOW);
+            case 3:
+                movementQueue.add(new Wait(this));
+                colorQueue.add(Color.GREEN);
+            case 2:
+                movementQueue.add(new MoveAndWait(this));
+                colorQueue.add(Color.BLUE);
+            case 1:
+                movementQueue.add(new Teleport(this));
+                colorQueue.add(Color.PURPLE);
         }
-        if (this.xArrayLocation + xVector >= 0 && this.xArrayLocation + xVector < columns)
-        {
-            if (this.yArrayLocation + yVector >= 0 && this.yArrayLocation + yVector < rows)
-            {
-                this.xArrayLocation += xVector;
-                this.yArrayLocation += yVector;
-                playerMoved = true;
-            }
+    }
+
+    public boolean hasNextMovement(){
+        boolean hasNext = false;
+        if (movementQueue.size()>0) {
+            hasNext = true;
         }
-        return playerMoved;
+        return hasNext;
+    }
+
+    public void nextMovement(){
+        setMove(movementQueue.poll());
+        setColor(colorQueue.poll());
     }
 
     @Override
     public void draw(ShapeRenderer aShape)
     {
-
-        //xDrawLocation + pixelBlockWidth / 2, yDrawLocation + pixelBlockHeight / 2
-        //aShape.begin(ShapeRenderer.ShapeType.Filled);
         aShape.setColor(color);
         float xDrawLocation = (xArrayLocation * width) + width / 2; //Must divide by 2 to make sure draw location is in middle of block
         float yDrawLocation = (yArrayLocation * height) + height / 2;
         aShape.circle(xDrawLocation, yDrawLocation, radius);
-        //aShape.end();
-        //drawText();
+    }
+
+    public void setMove(Move move){
+        this.move = move;
+    }
+
+    public int getPreviousX() {
+        return previousX;
+    }
+
+    public int getPreviousY() {
+        return previousY;
     }
 
     @Override
@@ -122,14 +142,15 @@ public class Player extends Block
     }
 
     /**
-     * Draws a text version of a player and returns the first letter in uppercase.
-     * Ex. "Paul" -> "P"
-     *
-     * @return String, first letter capatalized
+     * Draws a description of the movement of the Player if the player is creaed by the user.
      */
-    public String drawText()
-    {
-        return name.substring(0, 1).toUpperCase();
+    public void drawText(BitmapFont bitmapFont, SpriteBatch batch) {
+        //double scale = Math.pow(.5, width);
+        bitmapFont.getData().setScale(.5f, .5f);
+        if (this.createdByUser) {
+            bitmapFont.draw(batch, move.getMovementName(), (xArrayLocation * width) + ((width - 80) / 2),
+                    (yArrayLocation * height) + height / 2, 80, 1, true);
+        }
     }
 
     public boolean checkCollision(Block anotherBlock)
