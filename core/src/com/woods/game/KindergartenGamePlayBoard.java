@@ -56,7 +56,7 @@ public class KindergartenGamePlayBoard implements Screen
 
     found foundFunc;
     statistics statisticsFunc;
-    placement placementFunc;
+
 
     public KindergartenGamePlayBoard(final Woods aGame, MenuScreen aScreen, final int rows, final int columns)
     {
@@ -76,8 +76,8 @@ public class KindergartenGamePlayBoard implements Screen
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
         aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
-                (game.camera.viewportHeight - bottomEdgeBuffer) / rows);
-        aBoardController.createKTo2Players();
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, 4);
+        aBoardController.createPlayersDefaultLocation();
         aBoardController.createArrayOfTextures(aGame.boardTextures);
         stateOfGame = State.RUN;
 
@@ -280,7 +280,6 @@ public class KindergartenGamePlayBoard implements Screen
         {
             resetBoard();
         }
-
     }
 
     /**
@@ -289,7 +288,7 @@ public class KindergartenGamePlayBoard implements Screen
     private void resetBoard()
     {
         //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.createKTo2Players();
+        aBoardController.createPlayersDefaultLocation();
         stateOfGame = State.RUN;
         aBoardController.totalPlayerMovements = 0;
         aBoardController.playerUpdateTime = 0.3f;

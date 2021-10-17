@@ -34,7 +34,6 @@ public class Woods extends Game
     Texture img;
     BitmapFont monoFont;
     BitmapFont medievalFont;
-    BitmapFont playerFont;
     BitmapFont arrowKeyFont;
     BitmapFont largeFont;
     Label.LabelStyle aLabelStyle;
@@ -78,7 +77,6 @@ public class Woods extends Game
         addTextures();
         this.monoFont = new BitmapFont();
         this.medievalFont = new BitmapFont(Gdx.files.internal("leela.fnt"));
-        this.playerFont = new BitmapFont(Gdx.files.internal("leela.fnt"));
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
         this.largeFont = new BitmapFont(Gdx.files.internal("leelaLarge.fnt"));
         aLabelStyle = new Label.LabelStyle();
@@ -114,7 +112,6 @@ public class Woods extends Game
         forestMusic.dispose();
         monoFont.dispose();
         medievalFont.dispose();
-        playerFont.dispose();
         arrowKeyFont.dispose();
         for (int i = 0; i < boardTextures.length; i++)
         {
@@ -142,7 +139,10 @@ public class Woods extends Game
         menuTextures.put("SleepingBunny", new Texture(Gdx.files.internal("sleepingBunny.png")));
         menuTextures.put("Info", new Texture(Gdx.files.internal("info.png")));
         menuTextures.put("Pig", new Texture(Gdx.files.internal("pig.png")));
-
+        menuTextures.put("Back", new Texture(Gdx.files.internal("back.png")));
+        menuTextures.put("Okay", new Texture(Gdx.files.internal("okay2.png")));
+        menuTextures.put("Select", new Texture(Gdx.files.internal("select2.png")));
+        menuTextures.put("Normal", new Texture(Gdx.files.internal("normal.png")));
 
         boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
         boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
@@ -195,8 +195,6 @@ public class Woods extends Game
         textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
         TextField rowTextField = new TextField("2-50", textFieldStyleThing);
         TextField colTextField = new TextField("2-50", textFieldStyleThing);
-
-
 
         textFields.put("Row", rowTextField);
         textFields.put("Col", colTextField);

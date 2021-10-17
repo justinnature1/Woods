@@ -34,7 +34,10 @@ public class MenuController
     private TextField rowTextField;
     private TextField colTextField;
     private TextField playerTextField;
-
+    private Button exitButton, startButton, infoButton, backButton, okayButton, selectButton, normalButton;
+    private ImageTextButton imageOfBunny, imageOfPig;
+    private Label welcomeLabel, rowLabel, columnLabel, playerLabel, gameInfoLabel, k2InfoLabel,
+            threeToFiveInfoLabel, selectModeLabel;
 
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
@@ -372,6 +375,23 @@ public class MenuController
         imageOfPig.setY(5 * screenDimensions.blockPixelHeight);
         imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
 
+        Button.ButtonStyle backStyle = new Button.ButtonStyle();
+        Texture backTexture = new Texture(Gdx.files.internal("back.png"));
+        backStyle.up = new TextureRegionDrawable(backTexture);
+        backStyle.over = new TextureRegionDrawable(backTexture).tint(Color.CYAN);
+        backButton = new Button(backStyle);
+        backButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        backButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
+
+        Button.ButtonStyle okayStyle = new Button.ButtonStyle();
+        Texture okayTexture = new Texture(Gdx.files.internal("okay2.png"));
+        okayStyle.up = new TextureRegionDrawable(okayTexture);
+        okayStyle.over = new TextureRegionDrawable(okayTexture).tint(Color.CYAN);
+        okayButton = new Button(okayStyle);
+        okayButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.5f);
+        okayButton.setSize(5 * screenDimensions.blockPixelWidth,
+                3 * screenDimensions.blockPixelHeight);
     }
 
     /**
@@ -527,16 +547,6 @@ public class MenuController
     public void setImageOfPig(ImageTextButton imageOfPig)
     {
         this.imageOfPig = imageOfPig;
-    }
-
-    public ImageTextButton getImageOfCow()
-    {
-        return imageOfCow;
-    }
-
-    public void setImageOfCow(ImageTextButton imageOfCow)
-    {
-        this.imageOfCow = imageOfCow;
     }
 
     public Label getWelcomeLabel()
