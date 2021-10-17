@@ -33,7 +33,7 @@ public class MenuController
     private TextField colTextField;
     private TextField playerTextField;
     private Button exitButton, startButton, infoButton;
-    private ImageTextButton imageOfBunny, imageOfPig;
+    private ImageTextButton imageOfBunny, imageOfPig, imageOfCow;
     private Label welcomeLabel, rowLabel, columnLabel, playerLabel;
 
     private final int WORLD_WIDTH = 50;
@@ -319,6 +319,23 @@ public class MenuController
         imageOfPig.setY(5 * screenDimensions.blockPixelHeight);
         imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
 
+
+        Texture cowTexture = game.menuTextures.get("Cow");
+        TextureRegion cowRegion = new TextureRegion(cowTexture);
+        ImageTextButton.ImageTextButtonStyle cowStyle = new ImageTextButton.ImageTextButtonStyle();
+        cowStyle.overFontColor = Color.RED;
+        cowStyle.fontColor = Color.BLACK;
+        cowStyle.font = game.largeFont;
+        Image cowImage = new Image(cowRegion);
+        cowImage.setSize(screenDimensions.blockPixelWidth * 5, screenDimensions.blockPixelHeight * 5);
+        cowImage.setX(25 * screenDimensions.blockPixelWidth);
+        someSkin.add("cow", cowRegion);
+        cowStyle.up = new TextureRegionDrawable(cowRegion);
+        cowStyle.over = someSkin.newDrawable("cow", Color.CORAL);
+        imageOfCow = new ImageTextButton("6-8", cowStyle);
+        imageOfCow.setY(8 * screenDimensions.blockPixelHeight);
+        imageOfCow.setX(28 * screenDimensions.blockPixelWidth);
+
     }
 
     /**
@@ -471,6 +488,16 @@ public class MenuController
     public void setImageOfPig(ImageTextButton imageOfPig)
     {
         this.imageOfPig = imageOfPig;
+    }
+
+    public ImageTextButton getImageOfCow()
+    {
+        return imageOfCow;
+    }
+
+    public void setImageOfCow(ImageTextButton imageOfCow)
+    {
+        this.imageOfCow = imageOfCow;
     }
 
     public Label getWelcomeLabel()

@@ -39,7 +39,8 @@ public class BoardScreen implements Screen
         RUN,
         RESUME,
         STOPPED,
-        FOUND
+        FOUND,
+        PLACEMENT
     }
 
     OrthographicCamera theCamera;
@@ -48,26 +49,27 @@ public class BoardScreen implements Screen
     BoardController aBoardController;
     Woods game;
     ShapeRenderer aShape;
-    int rows, columns, players;
+    int rows, columns;
     Screen aScreen;
     State stateOfGame;
+    State beginningState;
     Stage uiStage;
+    int rightSideBuffer;
+    int bottomEdgeBuffer;
+    Player playerUp = null;
 
     Button resetButton;
     Button exitButton;
-    float totalTimesRan, totalMovements, average;
     Sprite aSprite;
     Skin someSkin;
 
     statistics statisticsFunc;
     found foundFunc;
+    placement placementFunc;
 
     BitmapFont arrowKeyFont;
 
-    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int players)
-    {
-
-
+    private BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, State stateOfGame){
         this.arrowKeyFont = new BitmapFont(Gdx.files.internal("monospace.fnt"));
 
         this.aScreen = aScreen;
@@ -80,14 +82,14 @@ public class BoardScreen implements Screen
         this.uiStage = new Stage(aViewport);
         someSkin = new Skin();
 
-        int rightSideBuffer = 0;
-        int bottomEdgeBuffer = 0;
+        this.rightSideBuffer = 0;
+        this.bottomEdgeBuffer = 0;
 
         //Subtracting the rightSideBuffer from theCamera.viewportWidth or height will leave blank space on the right side or bottom side
         aBoardController = new BoardController(aGame, rows, columns, (game.camera.viewportWidth - rightSideBuffer) / columns,
-                (game.camera.viewportHeight - bottomEdgeBuffer) / rows, players);
+                (game.camera.viewportHeight - bottomEdgeBuffer) / rows);
 
-        aBoardController.createPlayersDefaultLocation();
+
         aBoardController.createArrayOfTextures(aGame.boardTextures);
 
         Button.ButtonStyle exitButtonStyle = new Button.ButtonStyle();
@@ -101,7 +103,8 @@ public class BoardScreen implements Screen
         exitButton.setHeight((float) exitTexture.getHeight() / 4);
         exitButton.setColor(Color.CHARTREUSE.r, Color.CHARTREUSE.g, Color.CHARTREUSE.b, 0.8f);
 
-        stateOfGame = State.RUN;
+        this.stateOfGame = stateOfGame;
+        this.beginningState = stateOfGame;
         resetButton = game.buttons.get("reset");
 
         uiStage.addActor(resetButton);
@@ -113,7 +116,7 @@ public class BoardScreen implements Screen
             public void drawCollision(SpriteBatch aBatch)
             {
                 game.medievalFont.setColor(Color.MAGENTA.r, Color.MAGENTA.g, Color.MAGENTA.b, 1);
-                game.medievalFont.draw(game.batch, "Players found eachother!", game.camera.viewportWidth / 2, game.camera.viewportHeight / 2, 20f, 1, true);
+                game.medievalFont.draw(game.batch, "Players found each other!", game.camera.viewportWidth / 2, game.camera.viewportHeight / 2, 20f, 1, true);
             }
         };
 
@@ -124,11 +127,37 @@ public class BoardScreen implements Screen
             {
                 game.monoFont.setColor(1, 1, 0, 1.3f);
                 game.medievalFont.draw(game.batch, "Total Moves -- " + aBoardController.totalPlayerMovements, 50, game.camera.viewportHeight - 10);
-                game.monoFont.draw(game.batch, "Average: " + average, 50, game.camera.viewportHeight - 40);
+                game.monoFont.draw(game.batch, "Average: " + aBoardController.getAverage(), 50, game.camera.viewportHeight - 40);
                 game.arrowKeyFont.draw(game.batch, "Rows: " + rows, 50, game.camera.viewportHeight - 70);
                 game.arrowKeyFont.draw(game.batch, "Columns: " + columns, 50, game.camera.viewportHeight - 90);
             }
         };
+
+        this.placementFunc = new placement()
+        {
+            @Override
+            public void drawPlacementInstructions(SpriteBatch aBatch)
+            {
+                game.medievalFont.setColor(Color.MAGENTA.r, Color.MAGENTA.g, Color.MAGENTA.b, 1);
+                game.medievalFont.draw(game.batch, "Click in a tile to add a player.  " +
+                        "Click again to change the player's movement. After creating two or more players, press the Enter key to begin.",
+                        10, game.camera.viewportHeight/2, game.camera.viewportWidth-20, 1, true);
+            }
+        };
+
+
+    }
+
+
+    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns) {
+        this(aGame,aScreen,rows,columns, State.PLACEMENT);
+    }
+
+
+    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int numPlayers)
+    {
+        this(aGame,aScreen,rows,columns, State.RUN);
+        aBoardController.createPlayersDefaultLocation(numPlayers);
     }
 
     /**
@@ -159,8 +188,6 @@ public class BoardScreen implements Screen
                 changeScreens();
             }
         });
-
-
     }
 
     /**
@@ -197,6 +224,13 @@ public class BoardScreen implements Screen
         aBoardController.drawDirections();
         this.arrowKeyFont.setColor(Color.MAGENTA);
         aBoardController.drawStatistics(statisticsFunc);
+        if (columns > 20) {
+            if (playerUp != null) {
+                playerUp.drawText(game.playerFont, game.batch);
+            }
+        } else {
+            aBoardController.drawPlayerText(game.batch);
+        }
         game.batch.end();
 
         uiStage.act();
@@ -224,6 +258,22 @@ public class BoardScreen implements Screen
             game.batch.end();
         }
 
+        if (stateOfGame == State.PLACEMENT)
+        {
+            game.batch.begin();
+            aBoardController.drawPlacementInstructions(placementFunc);
+            game.batch.end();
+        }
+
+
+    }
+
+    //Gets the position of the mouse and converts coordinates to match camera coordinates.
+    public Vector3 mousePositionInWorld(OrthographicCamera camera) {
+        Vector3 v = new Vector3();
+        v.set(Gdx.input.getX(), Gdx.input.getY(), 0f);
+        camera.unproject(v);
+        return v;
     }
 
     /**
@@ -231,12 +281,33 @@ public class BoardScreen implements Screen
      */
     public void update()
     {
+
         //TODO Write a pause text when pressing spacebar
         Input anInput = Gdx.input;
 
         if (anInput.isKeyPressed(Input.Keys.ESCAPE))
         {
             changeScreens();
+        }
+
+        if (stateOfGame == State.PLACEMENT){
+            Vector3 v = mousePositionInWorld(theCamera);
+            int mouseX = (int) v.x;
+            int mouseY = (int) v.y;
+            int xArrayLocation = (int) (mouseX / aBoardController.pixelBlockWidth);
+            int yArrayLocation = (int) (mouseY / aBoardController.pixelBlockHeight);
+
+            if (columns > 20) {
+                this.playerUp = aBoardController.findPlayer(xArrayLocation, yArrayLocation);
+            }
+            if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+                System.out.printf("%d / %f = %d%n",mouseX, aBoardController.pixelBlockWidth, xArrayLocation);
+                System.out.printf("%d / %f = %d%n",mouseY, aBoardController.pixelBlockHeight, yArrayLocation);
+
+                aBoardController.createUpdatePlayer(xArrayLocation, yArrayLocation);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.ENTER) && aBoardController.aPlayers.size()>=2){
+                this.stateOfGame = State.RUN;
+            }
         }
 
         if (stateOfGame == State.RUN)
@@ -259,10 +330,8 @@ public class BoardScreen implements Screen
             //stateOfGame = State.STOPPED;
             stateOfGame = State.FOUND;
             this.pause();
-            totalTimesRan++;
-            totalMovements += aBoardController.totalPlayerMovements; //Adds all the player movements so far in the game
-            average = totalMovements / totalTimesRan;
-            aBoardController.setAverage(average);
+
+            aBoardController.setAverage();
             //aBoardController.fade(aShape);
         }
 
@@ -274,8 +343,8 @@ public class BoardScreen implements Screen
         if (anInput.isTouched())
         {
             //game.medievalFont.draw(game.batch, "hellos", 400, 400);
-            System.out.println("meow");
-            System.out.println(aViewport.unproject(new Vector2((anInput.getX()), anInput.getY())));
+            //System.out.println("meow");
+            //System.out.println(aViewport.unproject(new Vector2((anInput.getX()), anInput.getY())));
             /*sprite.setPosition(Gdx.input.getX() - sprite.getWidth()/2,
                     Gdx.graphics.getHeight() - Gdx.input.getY() - sprite.getHeight()/2);*/
         }
@@ -304,8 +373,8 @@ public class BoardScreen implements Screen
     {
 
         //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.createPlayersDefaultLocation();
-        stateOfGame = State.RUN;
+        aBoardController.resetPlayers();
+        stateOfGame = beginningState;
         aBoardController.totalPlayerMovements = 0;
         aBoardController.playerUpdateTime = 0.3f;
         this.pause();

@@ -1,5 +1,6 @@
 package com.woods.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
@@ -23,11 +24,10 @@ public class BoardController
     int numberOfColumns;
     float pixelBlockWidth;
     float pixelBlockHeight;
-    int numberOfPlayers;
-    Player[] aPlayers;
-    String[] playerNames = {"Joel", "Chris", "Mary", "Lyra"};
+    List<Player> aPlayers = new ArrayList<>();
+    List<Player> beginningPlayers = new ArrayList<>();
     int totalPlayerMovements;
-    float average;
+    float totalTimesRan, totalMovements, average;
 
     Music adventureMusic;
 
@@ -35,16 +35,8 @@ public class BoardController
     float playerMovementTimer;
 
 
-    public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers)
+    public BoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight)
     {
-        /*if (numberOfRows < 5 || numberOfColumns < 5)
-        {
-            throw new IllegalArgumentException("Number of rows or number of columns must be above 9");
-        }
-        if (numberOfPlayers < 2)
-        {
-            throw new IllegalArgumentException("Number of players must be above 1");
-        }*/
         this.game = aGame;
         this.tileBoard = new BoardOfPieces(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
         this.playerBoard = new Board(numberOfRows, numberOfColumns, pixelBlockWidth, pixelBlockHeight);
@@ -53,83 +45,133 @@ public class BoardController
         this.numberOfColumns = numberOfColumns;
         this.pixelBlockWidth = pixelBlockWidth;
         this.pixelBlockHeight = pixelBlockHeight;
-        this.numberOfPlayers = numberOfPlayers;
-        this.aPlayers = new Player[numberOfPlayers];
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+        resetAverage();
+    }
+
+    private void resetAverage() {
+        this.totalPlayerMovements = 0;
+        this.totalTimesRan = 0;
+        this.average = 0;
+    }
+
+    /**
+     * Creates two players in opposite corners of the board.
+     */
+
+    public void createKTo2Players(){
+        createPlayersDefaultLocation(2);
+    }
+
+    private void clonePlayers() {
+        beginningPlayers = new ArrayList<>();
+        for (Player player : aPlayers) {
+            this.beginningPlayers.add(new Player(player));
+        }
+    }
+
+    public void createUpdatePlayer(int xArrayLocation, int yArrayLocation){
+        resetAverage(); //Reset average if player configuration changes.
+        this.collidedLocations = new ArrayList<>();
+        Player player = findPlayer(xArrayLocation, yArrayLocation);
+        if (player == null){
+            aPlayers.add(new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, true));
+        } else {
+            if (player.hasNextMovement()){
+                player.nextMovement();
+            } else {
+                aPlayers.remove(player);
+            }
+        }
+        clonePlayers();
+    }
+
+    public boolean isSwapCollision(Player self){
+        int xCurrentP1 = self.getxArrayLocation();
+        int yCurrentP1 = self.getyArrayLocation();
+
+        for (Player player : aPlayers) {
+            int xPastP2 = player.getPreviousX();
+            int yPastP2 = player.getPreviousY();
+
+            //If player is in another player's previous location
+            if (self != player && xPastP2 == xCurrentP1 && yPastP2 == yCurrentP1){
+                int xPastP1 = self.getPreviousX();
+                int yPastP1 = self.getPreviousY();
+
+                int xCurrentP2 = player.getxArrayLocation();
+                int yCurrentP2 = player.getyArrayLocation();
+
+                //And if the other player is in the player's previous location
+                if(xPastP1 == xCurrentP2 && yPastP1 == yCurrentP2) {
+                    //Determines and moves colliding players to the middle of their locations.
+                    player.setxArrayLocation(self.xArrayLocation);
+                    player.setyArrayLocation(self.yArrayLocation);
+                    return true; //They swapped locations and should have collided.
+                }
+            }
+        }
+        return false; //No swapping collisions found
+    }
+
+    public Player findPlayer(int xArrayLocation, int yArrayLocation) {
+        for (Player player : aPlayers) {
+            if (player.getxArrayLocation() == xArrayLocation && player.getyArrayLocation() == yArrayLocation){
+                return player;
+            }
+        }
+        return null;
     }
 
     /**
      * Creates players at RANDOM locations on the board using Player objects and stores them in an array
      */
-    public void createPlayersRandomLocations()
+    public void createPlayersRandomLocations(int numberOfPlayers)
     {
+        aPlayers.clear();
         Random aRan = new Random();
         int currentPlayersAdded = 0;
 
         //This loop will add random players and makes sure that it doesn't add on the same location
-        while (currentPlayersAdded < this.numberOfPlayers)
+        while (currentPlayersAdded < numberOfPlayers)
         {
             int xArrayLocation = aRan.nextInt(numberOfColumns);
             int yArrayLocation = aRan.nextInt(numberOfRows);
 
             if (playerBoard.boardArray[yArrayLocation][xArrayLocation] == null)
             {
-                String aName = playerNames[currentPlayersAdded];
-                Player aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, aName);
-                aPlayers[currentPlayersAdded] = aPlayer;
+                Player aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false);
+                aPlayers.add(aPlayer);
                 playerBoard.boardArray[yArrayLocation][xArrayLocation] = aPlayer;
                 currentPlayersAdded++;
             }
         }
+        clonePlayers();
     }
 
     /**
      * Creates players at default locations. Which are the corners of the board.
      */
-    public void createPlayersDefaultLocation() throws IllegalArgumentException
+    public void createPlayersDefaultLocation(int numberOfPlayers) throws IllegalArgumentException
     {
         if (numberOfPlayers > 4)
-        {
             throw new IllegalArgumentException("Too many players and not enough corners, for default corner locations");
+
+        aPlayers.clear();
+
+        switch (numberOfPlayers){
+            case 4:
+                aPlayers.add(new Player(0, 0, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
+            case 3:
+                aPlayers.add(new Player(numberOfColumns - 1, numberOfRows - 1, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
+            case 2:
+                aPlayers.add(new Player(numberOfRows - 1, 0, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
+            case 1:
+                aPlayers.add(new Player(0, numberOfColumns - 1, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
         }
-
-        int amountOfPlayersLeftToAdd = 0;
-        int xVector = numberOfColumns - 1; //To eliminate index out of bounds exception, subtract 1
-        int yVector = numberOfRows - 1;
-        int xArrayLocation = 0;
-        int yArrayLocation = 0;
-        Player aPlayer;
-
-        //TODO Should fix the following loop, just use a simple equation to put players in corners instead
-        //This default player creation will create players starting at the Northwest corner
-        while (amountOfPlayersLeftToAdd < this.numberOfPlayers)
-        {
-            aPlayer = new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, "Meow");
-            aPlayers[amountOfPlayersLeftToAdd] = aPlayer;
-            //playerBoard.boardArray[yArrayLocation][xArrayLocation] = aPlayer;
-            //tileBoard.getPiecesArray()[yArrayLocation][xArrayLocation].addPiece(aPlayer); Might use this later
-
-            //NorthEast Corner
-            if (xArrayLocation == 0 && yArrayLocation == 0)
-            {
-                xArrayLocation += xVector;
-                yArrayLocation += yVector;
-            }
-            //NorthWest Corner
-            else if (xArrayLocation == numberOfColumns - 1 && yArrayLocation == numberOfRows - 1)
-            {
-                xArrayLocation -= xVector;
-            }
-            //SouthEast Corner
-            else if (xArrayLocation == 0 && yArrayLocation == numberOfRows - 1)
-            {
-                xArrayLocation += xVector;
-                yArrayLocation -= yVector;
-            }
-            amountOfPlayersLeftToAdd++;
-        }
+        clonePlayers();
     }
 
     /**
@@ -138,26 +180,21 @@ public class BoardController
      *
      * @return boolean
      */
-    public boolean playerConflict()
-    {
+    public boolean playerConflict() {;
+        boolean collision = false;
         ArrayList<Player> playerConflictArrayList = new ArrayList<>();
-
-        for (Player aPlayer : aPlayers)
-        {
-            if (playerConflictArrayList.contains(aPlayer))
-            {
+        for (Player aPlayer : aPlayers) {
+            collision = playerConflictArrayList.contains(aPlayer) ||  /*Players are on same spot*/
+                    isSwapCollision(aPlayer); /*Players swap locations (meaning they pass each other).*/
+            if (collision) {
                 collidedLocations.add(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, new Color(Color.LIGHT_GRAY),
-                        aPlayer.width, aPlayer.height, "found"));
-                //Pieces somePieces = tileBoard.getPiecesArray()[aPlayer.yArrayLocation][aPlayer.xArrayLocation];
-                //somePieces.addPiece(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, Color.SALMON, aPlayer.width, aPlayer.height, "found"));
-                //aPlayer.color.set(Color.MAGENTA);
-                return true;
-            } else
-            {
+                        aPlayer.width, aPlayer.height, false));
+                break;
+            } else {
                 playerConflictArrayList.add(aPlayer);
             }
         }
-        return false;
+        return collision;
     }
 
     /**
@@ -174,6 +211,11 @@ public class BoardController
     public void drawCollision(found foundFunction)
     {
         foundFunction.drawCollision(game.batch);
+    }
+
+    public void drawPlacementInstructions(placement placementFunction)
+    {
+        placementFunction.drawPlacementInstructions(game.batch);
     }
 
     public void drawStatistics(statistics aStatFunction)
@@ -288,6 +330,13 @@ public class BoardController
         }
     }
 
+    public void drawPlayerText(SpriteBatch batch) {
+        for (Player somePlayer : aPlayers)
+        {
+            somePlayer.drawText(game.playerFont, batch);
+        }
+    }
+
     public void fade(ShapeRenderer renderer)
     {
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)
@@ -324,9 +373,11 @@ public class BoardController
         return average;
     }
 
-    public void setAverage(float average)
+    public void setAverage()
     {
-        this.average = average;
+        this.totalTimesRan++;
+        this.totalMovements += this.totalPlayerMovements; //Adds all the player movements so far in the game
+        this.average = this.totalMovements / this.totalTimesRan;
     }
 
     /**
@@ -340,27 +391,27 @@ public class BoardController
         {
             for (Player somePlayer : aPlayers)
             {
-                int oldXArrayLocation = somePlayer.xArrayLocation;
-                int oldYArrayLocation = somePlayer.yArrayLocation;
-                boolean playerMoved = somePlayer.playerMovement(numberOfRows, numberOfColumns);
-                /*if (playerMoved)
-                {
-                    //playerBoard.boardArray[somePlayer.yArrayLocation][somePlayer.xArrayLocation] = somePlayer;
-                    //playerBoard.boardArray[oldYArrayLocation][oldXArrayLocation] = null;
-                    //tileBoard.getPiecesArray()[oldYArrayLocation][oldXArrayLocation].removePiece(somePlayer);
-                    //tileBoard.getPiecesArray()[somePlayer.yArrayLocation][somePlayer.xArrayLocation].addPiece(somePlayer);
-                }
-                assert somePlayer.yArrayLocation < numberOfRows;*/
+                somePlayer.playerMovement(numberOfRows, numberOfColumns);
             }
             totalPlayerMovements++;
             playerMovementTimer = 0;
         }
+    }
+
+    public void resetPlayers() {
+        aPlayers = this.beginningPlayers;
+        clonePlayers();
     }
 }
 
 interface found
 {
     void drawCollision(SpriteBatch aBatch);
+}
+
+interface placement
+{
+    void drawPlacementInstructions(SpriteBatch aBatch);
 }
 
 interface statistics
