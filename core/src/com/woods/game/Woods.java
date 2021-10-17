@@ -24,7 +24,6 @@ import java.util.Map;
 
 /**
  * Main class for the game
- * Name: Robert Zafaripour
  * This game will simply simulate a collision from several players on a tile board.
  * Framework: libGDX
  */
@@ -72,7 +71,7 @@ public class Woods extends Game
         boardTextures = new Texture[10];
         this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //Sets the game size, the full width/height is the entire length in pixels
         camera.setToOrtho(true);
-        aViewport = new ScreenViewport();
+        aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
         aViewport.apply();
 
         addTextures();

@@ -289,7 +289,7 @@ public class OldBoardController
             for (int j = 0; j < tileBoard.getPiecesArray()[i].length; j++)
             {
                 arrayTextureIndex = aRan.nextInt(10);
-                aTexture = textureArray[4]; //Too many different textures on large super large boards will slow down HTML build, GWT is slow
+                aTexture = textureArray[arrayTextureIndex]; //Too many different textures on large super large boards will slow down HTML build, GWT is slow
 
                 aTile = new TextureTile(j, i, pixelBlockWidth, pixelBlockHeight, Color.GRAY, aTexture);
                 aRectTile = new GraphicsTile(j, i, Color.GRAY, pixelBlockWidth, pixelBlockHeight);
