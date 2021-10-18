@@ -5,7 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -13,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.ArrayList;
 
 /**
  * This class will eventually abstract much of the menu objects and menu screens and avoid code redundancy
@@ -36,10 +41,11 @@ public class MenuController
     private TextField playerTextField;
 
 
-    private Button exitButton, startButton, infoButton, backButton, okayButton, selectButton, normalButton;
+    private Button exitButton, startButton, infoButton, backButton, okayButton, selectButton, normalButton, resetButton;
     private ImageTextButton imageOfBunny, imageOfPig, imageOfCow;
+    private Animations starAnimation;
     private Label welcomeLabel, rowLabel, columnLabel, playerLabel, gameInfoLabel, k2InfoLabel,
-            threeToFiveInfoLabel, selectModeLabel;
+            threeToFiveInfoLabel, selectModeLabel, selectionScreenInfo;
 
     private final int WORLD_WIDTH = 50;
     private final int WORLD_HEIGHT = 50;
@@ -68,6 +74,7 @@ public class MenuController
         createButtons();
         createImages();
         createLabels();
+        createAnimations();
     }
 
     public void createLabels()
@@ -97,6 +104,9 @@ public class MenuController
                 "Game will start with 4 players with 10 rows and 10 columns.", someSkin);
         k2InfoLabel.setWrap(false);
         k2InfoLabel.setAlignment(Align.center);
+
+        selectionScreenInfo = new Label("", someSkin);
+
 
         threeToFiveInfoLabel = new Label("This game mode is made for grades 3-5.\n" +
                 "Students will be able to choose the amount of rows and columns\n" +
@@ -135,6 +145,14 @@ public class MenuController
         labelGroup.addActor(rowLabel);
         labelGroup.addActor(columnLabel);
         labelGroup.addActor(playerLabel);
+    }
+
+    public void createAnimations()
+    {
+        Texture starTexture = game.menuTextures.get("Star");
+        Array<Texture> arrayOfStars = new Array<>();
+        arrayOfStars.add(starTexture);
+        starAnimation = new Animations(arrayOfStars, 24, 0.4f, 24, 1);
     }
 
     public void createTextFields()
@@ -263,7 +281,6 @@ public class MenuController
         };
 
 
-
         rowTextField.setTextFieldListener(rowListener);
         colTextField.setTextFieldListener(colListener);
         playerTextField.setTextFieldListener(playersListener);
@@ -293,7 +310,7 @@ public class MenuController
         TextureRegion normalRegion = new TextureRegion(normalTexture);
         normalButtonStyle.up = new TextureRegionDrawable(normalRegion);
         normalButtonStyle.over = someSkin.newDrawable("normal", Color.CORAL);
-        normalButtonStyle.checked = someSkin.newDrawable("normal", Color.GRAY);
+        normalButtonStyle.checked = someSkin.newDrawable("normal", Color.DARK_GRAY);
         normalButton = new Button(normalButtonStyle);
         normalButton.setWidth(screenDimensions.blockPixelWidth * 5);
         normalButton.setHeight(screenDimensions.blockPixelHeight * 4);
@@ -370,7 +387,6 @@ public class MenuController
         imageOfPig.setX(15 * screenDimensions.blockPixelWidth);
 
 
-
         Button.ButtonStyle backStyle = new Button.ButtonStyle();
         Texture backTexture = new Texture(Gdx.files.internal("back.png"));
         backStyle.up = new TextureRegionDrawable(backTexture);
@@ -405,6 +421,25 @@ public class MenuController
         imageOfCow = new ImageTextButton("6-8", cowStyle);
         imageOfCow.setY(8 * screenDimensions.blockPixelHeight);
         imageOfCow.setX(28 * screenDimensions.blockPixelWidth);
+
+        Button.ButtonStyle resetButtonStyle = new Button.ButtonStyle();
+
+        Texture resetTexture = game.menuTextures.get("Reset");
+        TextureRegion resetRegion = new TextureRegion(resetTexture);
+        someSkin.add("reset", resetTexture);
+        someSkin.add("black", exitTexture);
+        someSkin.add("info", infoTexture);
+
+
+        resetButtonStyle.up = new TextureRegionDrawable(resetRegion);
+
+        resetButtonStyle.down = someSkin.newDrawable("reset", Color.DARK_GRAY);
+        resetButtonStyle.over = someSkin.newDrawable("reset", Color.FIREBRICK); //This adds a new drawable using the white skin and applying Color.Lime
+        resetButton = new Button(resetButtonStyle);
+        resetButton.setColor(Color.BROWN.r, Color.BROWN.g, Color.BROWN.b, 0.8f);
+        resetButton.setX(game.camera.viewportWidth - 110);
+        resetButton.setHeight((float) resetTexture.getHeight() / 3);
+        resetButton.setWidth((float) resetTexture.getWidth() / 3);
 
     }
 
@@ -676,5 +711,20 @@ public class MenuController
     public Group getImageGroup()
     {
         return null;
+    }
+
+    public Label getSelectionScreenInfo()
+    {
+        return selectionScreenInfo;
+    }
+
+    public Button getResetButton()
+    {
+        return resetButton;
+    }
+
+    public Animations getStarAnimation()
+    {
+        return starAnimation;
     }
 }

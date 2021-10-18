@@ -32,7 +32,6 @@ public class Animations
         this.columns = columns;
         createTexture();
         anAnimation = new Animation<TextureRegion>(frameDuration, animationFrames);
-
     }
 
     /**
@@ -55,7 +54,6 @@ public class Animations
             }
         }
     }
-
 
     public void draw(Batch batch, float parentAlpha)
     {

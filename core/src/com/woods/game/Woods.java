@@ -147,9 +147,9 @@ public class Woods extends Game
         menuTextures.put("Okay", new Texture(Gdx.files.internal("okay2.png")));
         menuTextures.put("Select", new Texture(Gdx.files.internal("select2.png")));
         menuTextures.put("Normal", new Texture(Gdx.files.internal("normal.png")));
-
         menuTextures.put("Cow", new Texture(Gdx.files.internal("cow.png")));
 
+        menuTextures.put("Star", new Texture(Gdx.files.internal("star.png")));
 
         boardTextures[0] = new Texture(Gdx.files.internal("Tree_Pine_00.png"), true);
         boardTextures[1] = new Texture(Gdx.files.internal("Tree_Pine_01.png"), true);
@@ -202,8 +202,6 @@ public class Woods extends Game
         textFieldStyleThing.focusedBackground = someSkin.newDrawable("white", Color.PURPLE);
         TextField rowTextField = new TextField("2-50", textFieldStyleThing);
         TextField colTextField = new TextField("2-50", textFieldStyleThing);
-
-
 
         textFields.put("Row", rowTextField);
         textFields.put("Col", colTextField);

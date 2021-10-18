@@ -116,7 +116,6 @@ public class OldBoardController
         int yArrayLocation = 0;
         OldPlayer aPlayer;
 
-        //TODO Should fix the following loop, just use a simple equation to put players in corners instead
         //This default player creation will create players starting at the Northwest corner
         while (amountOfPlayersLeftToAdd < this.numberOfPlayers)
         {

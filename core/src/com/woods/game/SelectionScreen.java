@@ -5,11 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -30,27 +34,33 @@ public class SelectionScreen implements Screen, Menu
     }
 
     Woods game;
-    Screen returnScreen;
+    Screen returnScreen, aScreen;
     int rows, columns, players, playersToSelect;
     OldBoardController aBoardController;
     ShapeRenderer shapeRenderer;
     OldPlayer[] totalPlayersArray;
     State gameState;
     MenuController aMenuController;
-    Button startButton, backButton;
-    Group defaultButtons;
+    Button startButton, backButton, resetButton;
+    Group defaultButtons, labelGroup;
     Stage uiStage;
+    Label selectionScreenInfoLabel;
+    Board screenDimensions;
+    Animations starAnimation;
 
     public SelectionScreen(Woods game, Screen aScreen, int rows, int columns, int players)
     {
         game.camera.setToOrtho(false);
         this.game = game;
         this.returnScreen = aScreen;
+        this.aScreen = aScreen;
         this.columns = columns;
         this.players = players;
         this.rows = rows;
         this.playersToSelect = players;
         this.shapeRenderer = new ShapeRenderer();
+        screenDimensions = new Board(rows, columns, game.camera.viewportWidth / 50,
+                game.camera.viewportHeight / 50);
         aBoardController = new OldBoardController(game, rows, columns, game.camera.viewportWidth / columns,
                 game.camera.viewportHeight / rows, players);
         aBoardController.createArrayOfTextures(game.boardTextures);
@@ -59,28 +69,35 @@ public class SelectionScreen implements Screen, Menu
         aMenuController = new MenuController(game, this);
         this.uiStage = new Stage(game.aViewport);
         defaultButtons = new Group();
+        labelGroup = new Group();
         addButtons();
         assembleMenu();
+        addLabels();
         addListeners();
     }
 
     @Override
     public void addBackground()
     {
-
+        starAnimation = aMenuController.getStarAnimation();
     }
 
     @Override
     public void addButtons()
     {
+        resetButton = aMenuController.getResetButton();
         startButton = aMenuController.getStartButton();
+        startButton.setSize(screenDimensions.blockPixelWidth * 10, screenDimensions.blockPixelHeight * 10);
         backButton = aMenuController.getBackButton();
+        defaultButtons.addActor(resetButton);
         defaultButtons.addActor(backButton);
     }
 
     @Override
     public void assembleMenu()
     {
+        uiStage.addActor(starAni);
+        uiStage.addActor(labelGroup);
         uiStage.addActor(defaultButtons);
     }
 
@@ -110,12 +127,28 @@ public class SelectionScreen implements Screen, Menu
                 }
             }
         });
+
+        resetButton.addListener(new ChangeListener()
+        {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                gameState = State.SELECTION;
+                totalPlayersArray = new OldPlayer[players];
+                playersToSelect = players;
+                defaultButtons.removeActor(startButton);
+            }
+        });
     }
 
     @Override
     public void addLabels()
     {
-
+        selectionScreenInfoLabel = aMenuController.getSelectionScreenInfo();
+        selectionScreenInfoLabel.setText("Choose up to " + players + " spots on the board");
+        selectionScreenInfoLabel.setX((float) game.aViewport.getScreenWidth() / 3);
+        selectionScreenInfoLabel.setY((float) game.aViewport.getScreenHeight() / 2);
+        labelGroup.addActor(selectionScreenInfoLabel);
     }
 
     @Override
@@ -158,6 +191,10 @@ public class SelectionScreen implements Screen, Menu
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         OldBoardController.drawPlayers(shapeRenderer, totalPlayersArray);
         shapeRenderer.end();
+
+        game.batch.begin();
+        aBoardController.drawBoard(game.batch);
+        game.batch.end();
 
         uiStage.act();
         uiStage.draw();
