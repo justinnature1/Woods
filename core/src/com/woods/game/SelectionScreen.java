@@ -120,13 +120,7 @@ public class SelectionScreen implements Screen, Menu
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                try
-                {
-                    game.setScreen(new OldBoardScreen(game, new SelectionScreen(game, returnScreen, rows, columns, players), rows, columns, players, totalPlayersArray));
-                } catch (CloneNotSupportedException e)
-                {
-                    e.printStackTrace();
-                }
+                game.setScreen(new BoardScreen(game, new SelectionScreen(game, returnScreen, rows, columns, players), rows, columns, players));
             }
         });
 
