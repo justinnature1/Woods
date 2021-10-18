@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -71,6 +72,7 @@ public class BoardScreen implements Screen
     placement placementFunc;
 
     BitmapFont arrowKeyFont;
+    Group collisionStars;
 
 
     private BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, State stateOfGame){
@@ -85,6 +87,7 @@ public class BoardScreen implements Screen
         aViewport = aGame.aViewport;
         this.uiStage = new Stage(aViewport);
         someSkin = new Skin();
+        collisionStars = new Group();
 
         this.rightSideBuffer = 0;
         this.bottomEdgeBuffer = 0;
@@ -333,6 +336,11 @@ public class BoardScreen implements Screen
         {
             game.found.play();
             //stateOfGame = State.STOPPED;
+            for (Animations anAnimations : aBoardController.collidedStars)
+            {
+                collisionStars.addActor(anAnimations);
+            }
+            uiStage.addActor(collisionStars);
             stateOfGame = State.FOUND;
             this.pause();
 
@@ -378,7 +386,8 @@ public class BoardScreen implements Screen
     {
 
         //aBoardController.createArrayOfTextures(game.boardTextures);
-
+        aBoardController.clearCollisionStars(collisionStars, aBoardController.collidedStars);
+        aBoardController.collidedStars.clear();
         aBoardController.resetPlayers();
         stateOfGame = beginningState;
         aBoardController.totalPlayerMovements = 0;

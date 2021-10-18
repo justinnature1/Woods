@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.*;
 
@@ -24,11 +27,12 @@ public class BoardController
     int numberOfColumns;
     float pixelBlockWidth;
     float pixelBlockHeight;
-
+    Array<Animations> collidedStars; //Used to draw animated stars on board when there is a collision
     List<Player> aPlayers = new ArrayList<>();
     List<Player> beginningPlayers = new ArrayList<>();
     int totalPlayerMovements;
     float totalTimesRan, totalMovements, average;
+    MenuController aMenuController;
 
     Music adventureMusic;
 
@@ -49,6 +53,8 @@ public class BoardController
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+        this.aMenuController = new MenuController(aGame, new MenuScreen(game));
+        collidedStars = new Array<>();
         resetAverage();
     }
 
@@ -190,6 +196,12 @@ public class BoardController
             if (collision) {
                 collidedLocations.add(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, new Color(Color.LIGHT_GRAY),
                         aPlayer.width, aPlayer.height, false));
+                Animations aStar = aMenuController.createStarAnimations();
+                aStar.setX(aPlayer.xArrayLocation * aPlayer.width);
+                aStar.setY(aPlayer.yArrayLocation * aPlayer.height);
+                aStar.setWidth(aPlayer.width);
+                aStar.setHeight(aPlayer.height);
+                collidedStars.add(aStar);
                 break;
             } else {
                 playerConflictArrayList.add(aPlayer);
@@ -248,6 +260,14 @@ public class BoardController
                 tileBoard.getPiecesArray()[i][j] = somePiece;
                 somePiece.addPiece(aTile);
             }
+        }
+    }
+
+    public void clearCollisionStars(Group starGroup, Array<Animations> arrayOfActors)
+    {
+        for (Actor anActor : arrayOfActors)
+        {
+            starGroup.removeActor(anActor);
         }
     }
 
