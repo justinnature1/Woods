@@ -70,6 +70,7 @@ public class SelectionScreen implements Screen, Menu
         this.uiStage = new Stage(game.aViewport);
         defaultButtons = new Group();
         labelGroup = new Group();
+        addBackground();
         addButtons();
         assembleMenu();
         addLabels();
@@ -80,6 +81,7 @@ public class SelectionScreen implements Screen, Menu
     public void addBackground()
     {
         starAnimation = aMenuController.getStarAnimation();
+
     }
 
     @Override
@@ -96,7 +98,7 @@ public class SelectionScreen implements Screen, Menu
     @Override
     public void assembleMenu()
     {
-        uiStage.addActor(starAni);
+        //uiStage.addActor(starAnimation);
         uiStage.addActor(labelGroup);
         uiStage.addActor(defaultButtons);
     }

@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -60,6 +61,7 @@ public class OldBoardScreen implements Screen
     State stateOfGame;
     SelectionState selectState;
     Stage uiStage;
+    Group collisionStarsGroup;
 
     Button resetButton;
     Button exitButton;
@@ -86,6 +88,7 @@ public class OldBoardScreen implements Screen
         aViewport = aGame.aViewport;
         this.uiStage = new Stage(aViewport);
         someSkin = new Skin();
+        this.collisionStarsGroup = new Group();
 
         int rightSideBuffer = 0;
         int bottomEdgeBuffer = 0;
@@ -150,6 +153,7 @@ public class OldBoardScreen implements Screen
         theCamera = aGame.camera;
         aViewport = aGame.aViewport;
         this.uiStage = new Stage(aViewport);
+        this.collisionStarsGroup = new Group();
         someSkin = new Skin();
 
         int rightSideBuffer = 0;
@@ -338,8 +342,13 @@ public class OldBoardScreen implements Screen
             this.resume();
         }
 
-        if (findCollisions() && stateOfGame == State.RUN)
+        if ( stateOfGame == State.RUN && findCollisions())
         {
+            for (Animations anAnimations : aBoardController.conflictStars)
+            {
+                collisionStarsGroup.addActor(anAnimations);
+            }
+            uiStage.addActor(collisionStarsGroup);
             game.found.play();
             //stateOfGame = State.STOPPED;
             stateOfGame = State.FOUND;
@@ -393,6 +402,9 @@ public class OldBoardScreen implements Screen
             stateOfGame = State.RUN;
             aBoardController.totalPlayerMovements = 0;
             aBoardController.playerUpdateTime = 0.3f;
+            aBoardController.clearCollisionStars(collisionStarsGroup, aBoardController.conflictStars);
+            aBoardController.conflictStars.clear();
+
             this.pause();
         }
         else
@@ -401,6 +413,9 @@ public class OldBoardScreen implements Screen
             stateOfGame = State.RUN;
             aBoardController.totalPlayerMovements = 0;
             aBoardController.playerUpdateTime = 0.3f;
+            aBoardController.clearCollisionStars(collisionStarsGroup, aBoardController.conflictStars);
+            aBoardController.conflictStars.clear();
+            //collisionStarsGroup.removeActor(aBoardController.conflictStars.)
             this.pause();
         }
         //aBoardController.createArrayOfTextures(game.boardTextures);

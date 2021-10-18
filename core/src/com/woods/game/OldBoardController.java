@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.*;
 
@@ -29,6 +32,8 @@ public class OldBoardController
     String[] playerNames = {"Joel", "Chris", "Mary", "Lyra"};
     int totalPlayerMovements;
     float average;
+    Array<Animations> conflictStars;
+    MenuController aMenuController;
 
     Music adventureMusic;
 
@@ -48,9 +53,11 @@ public class OldBoardController
         this.pixelBlockHeight = pixelBlockHeight;
         this.numberOfPlayers = numberOfPlayers;
         this.aPlayers = new OldPlayer[numberOfPlayers];
+        this.conflictStars = new Array<>();
         this.totalPlayerMovements = 0;
         this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
+        this.aMenuController = new MenuController(game, new MenuScreen(aGame));
     }
 
     public OldBoardController(Woods aGame, int numberOfRows, int numberOfColumns, float pixelBlockWidth, float pixelBlockHeight, int numberOfPlayers,
@@ -70,6 +77,8 @@ public class OldBoardController
         this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
         originalPlayersLocation = new OldPlayer[numberOfPlayers];
+        this.aMenuController = new MenuController(game, new MenuScreen(aGame));
+        conflictStars = new Array<>();
 
         clonePlayers(playerArray);
     }
@@ -161,6 +170,13 @@ public class OldBoardController
             {
                 collidedLocations.add(new OldPlayer(aPlayer.xArrayLocation, aPlayer.yArrayLocation, new Color(Color.LIGHT_GRAY),
                         aPlayer.width, aPlayer.height, "found"));
+                Animations aStar = aMenuController.createStarAnimations();
+                aStar.setX(aPlayer.xArrayLocation * aPlayer.width);
+                aStar.setY(aPlayer.yArrayLocation * aPlayer.height);
+                aStar.setWidth(aPlayer.width);
+                aStar.setHeight(aPlayer.height);
+                conflictStars.add(aStar);
+
                 //Pieces somePieces = tileBoard.getPiecesArray()[aPlayer.yArrayLocation][aPlayer.xArrayLocation];
                 //somePieces.addPiece(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, Color.SALMON, aPlayer.width, aPlayer.height, "found"));
                 //aPlayer.color.set(Color.MAGENTA);
@@ -205,6 +221,7 @@ public class OldBoardController
             aPlayer.draw(aRenderer);
         }
     }
+
 
     public void drawCollision(found foundFunction)
     {
@@ -376,6 +393,14 @@ public class OldBoardController
                 somePiece.fade(renderer);
                 //aBlock.draw(renderer);
             }
+        }
+    }
+
+    public void clearCollisionStars(Group starGroup, Array<Animations> arrayOfActors)
+    {
+        for (Actor anActor : arrayOfActors)
+        {
+            starGroup.removeActor(anActor);
         }
     }
 

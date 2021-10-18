@@ -1,5 +1,6 @@
 package com.woods.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,14 +15,16 @@ import java.util.Map;
 /**
  * Texture Sprite Sheet class to merge multiple sprite sheets together
  */
-public class Animations
+public class Animations extends Actor
 {
     //TODO Finish proper draw implementation and update method
 
     Array<Texture> someTextures;
     TextureRegion[] animationFrames;
+    TextureRegion currentRegion;
     Animation<TextureRegion> anAnimation;
     int columns, rows;
+    float time = 0f;
 
     public Animations(Array<Texture> someTextures, int size, float frameDuration, int rows, int columns)
     {
@@ -55,8 +58,17 @@ public class Animations
         }
     }
 
-    public void draw(Batch batch, float parentAlpha)
-    {
+    @Override
+    public void act(float delta){
+        super.act(delta);
+        time += delta;
 
+        currentRegion = anAnimation.getKeyFrame(time, true);
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        batch.draw(currentRegion, getX(), getY(), getWidth(), getHeight()*1.5f);
     }
 }

@@ -5,9 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -16,8 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
-import java.util.ArrayList;
 
 /**
  * This class will eventually abstract much of the menu objects and menu screens and avoid code redundancy
@@ -74,7 +70,7 @@ public class MenuController
         createButtons();
         createImages();
         createLabels();
-        createAnimations();
+        createStarAnimations();
     }
 
     public void createLabels()
@@ -147,12 +143,13 @@ public class MenuController
         labelGroup.addActor(playerLabel);
     }
 
-    public void createAnimations()
+    public Animations createStarAnimations()
     {
         Texture starTexture = game.menuTextures.get("Star");
         Array<Texture> arrayOfStars = new Array<>();
         arrayOfStars.add(starTexture);
-        starAnimation = new Animations(arrayOfStars, 24, 0.4f, 24, 1);
+
+        return new Animations(arrayOfStars, 24, 0.04f, 1, 24);
     }
 
     public void createTextFields()
