@@ -68,13 +68,6 @@ public class BoardController
     }
 
     /**
-     * Creates two players in opposite corners of the board.
-     */
-    public void createKTo2Players(){
-        createPlayersDefaultLocation(2);
-    }
-
-    /**
      * Clones players to memorize their original location before moving. Very useful when not using default player starting locations,
      * such as the corners of the board
      */

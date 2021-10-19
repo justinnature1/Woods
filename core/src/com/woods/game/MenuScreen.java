@@ -137,13 +137,14 @@ public class MenuScreen implements Screen, Menu
             }
         });
 
+        //Starts the K to 2 Game with 2 players in opposite corners
         imageOfBunny.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
                 //game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 4));
+                game.setScreen(new BoardScreen(game, new MenuScreen(game), rows, columns, 2));
             }
         });
 
