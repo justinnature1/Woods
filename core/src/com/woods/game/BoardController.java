@@ -78,14 +78,14 @@ public class BoardController
         }
     }
 
-    public void createUpdatePlayer(int xArrayLocation, int yArrayLocation){
+    public void createUpdatePlayer(int xArrayLocation, int yArrayLocation, boolean changeMovement){
         resetAverage(); //Reset average if player configuration changes.
         this.collidedLocations = new ArrayList<>();
         Player player = findPlayer(xArrayLocation, yArrayLocation);
         if (player == null){
             aPlayers.add(new Player(xArrayLocation, yArrayLocation, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, true));
         } else {
-            if (player.hasNextMovement()){
+            if (player.hasNextMovement() && changeMovement){
                 player.nextMovement();
             } else {
                 aPlayers.remove(player);

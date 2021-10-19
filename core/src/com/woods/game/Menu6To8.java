@@ -166,7 +166,7 @@ public class Menu6To8 implements Screen, Menu {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, menu6To8, rows, columns));
+                game.setScreen(new BoardScreen(game, menu6To8, rows, columns, true));
             }
         });
 

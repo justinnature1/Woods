@@ -54,6 +54,7 @@ public class BoardScreen implements Screen
     Screen aScreen;
     State stateOfGame;
     State beginningState;
+    boolean changeMovement = false;
 
     Stage uiStage;
     int rightSideBuffer;
@@ -155,12 +156,13 @@ public class BoardScreen implements Screen
     }
 
 
-    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns) {
+    public BoardScreen(Woods aGame, Screen aScreen, int rows, int columns, boolean changeMovement ) {
         this(aGame,aScreen,rows,columns, State.PLACEMENT);
+        this.changeMovement = changeMovement;
     }
 
 
-    public BoardScreen(final Woods aGame, Screen aScreen, final int rows, final int columns, int numPlayers)
+    public BoardScreen(Woods aGame, Screen aScreen, int rows, int columns, int numPlayers)
     {
         this(aGame,aScreen,rows,columns, State.RUN);
         aBoardController.createPlayersDefaultLocation(numPlayers);
@@ -310,7 +312,7 @@ public class BoardScreen implements Screen
                 System.out.printf("%d / %f = %d%n",mouseX, aBoardController.pixelBlockWidth, xArrayLocation);
                 System.out.printf("%d / %f = %d%n",mouseY, aBoardController.pixelBlockHeight, yArrayLocation);
 
-                aBoardController.createUpdatePlayer(xArrayLocation, yArrayLocation);
+                    aBoardController.createUpdatePlayer(xArrayLocation, yArrayLocation, changeMovement);
             } else if (Gdx.input.isKeyPressed(Input.Keys.ENTER) && aBoardController.aPlayers.size()>=2){
                 this.stateOfGame = State.RUN;
             }
