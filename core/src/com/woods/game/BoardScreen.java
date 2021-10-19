@@ -3,7 +3,6 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -386,7 +384,7 @@ public class BoardScreen implements Screen
     {
 
         //aBoardController.createArrayOfTextures(game.boardTextures);
-        aBoardController.clearCollisionStars(collisionStars, aBoardController.collidedStars);
+        aBoardController.clearCollisionAnimation(collisionStars, aBoardController.collidedStars);
         aBoardController.collidedStars.clear();
         aBoardController.resetPlayers();
         stateOfGame = beginningState;

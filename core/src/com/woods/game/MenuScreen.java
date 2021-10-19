@@ -117,6 +117,7 @@ public class MenuScreen implements Screen, Menu
             }
         });
 
+        //This button will take you to the 6to8 menu screen
         imageOfCow.addListener(new ChangeListener()
         {
             @Override
@@ -220,7 +221,7 @@ public class MenuScreen implements Screen, Menu
     {
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        animationStatetime += Gdx.graphics.getDeltaTime();
+        animationStatetime += Gdx.graphics.getDeltaTime(); //Delta time is the amount of time since the last frame was rendered
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
         aBatch.setProjectionMatrix(game.camera.combined);

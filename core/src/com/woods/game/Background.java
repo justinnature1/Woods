@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class Background
 {
-    //TODO Change this class to use a Board data structure to determine dimensions of a background
+    //TODO Change this class to use a Board data structure to determine dimensions of a background or just grab the screen dimensions from the viewport
     Animations backgroundAnim;
     int rows, columns;
     Array<Texture> someTextures;

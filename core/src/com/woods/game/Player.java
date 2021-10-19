@@ -9,6 +9,9 @@ import com.woods.game.movement.*;
 
 import java.util.*;
 
+/**
+ * Creates a player class to be used on a game board
+ */
 public class Player extends Block
 {
 

@@ -51,13 +51,16 @@ public class BoardController
         this.pixelBlockWidth = pixelBlockWidth;
         this.pixelBlockHeight = pixelBlockHeight;
         this.totalPlayerMovements = 0;
-        this.playerUpdateTime = .3f; //Will update player movement every .3 seconds of game delta time
+        this.playerUpdateTime = .3f; //Will update player movement every .3 seconds between rendering frames
         this.adventureMusic = Gdx.audio.newMusic(Gdx.files.internal("brazilian.mp3"));
         this.aMenuController = new MenuController(aGame, new MenuScreen(game));
         collidedStars = new Array<>();
         resetAverage();
     }
 
+    /**
+     * Resets statistics
+     */
     private void resetAverage() {
         this.totalPlayerMovements = 0;
         this.totalTimesRan = 0;
@@ -67,11 +70,14 @@ public class BoardController
     /**
      * Creates two players in opposite corners of the board.
      */
-
     public void createKTo2Players(){
         createPlayersDefaultLocation(2);
     }
 
+    /**
+     * Clones players to memorize their original location before moving. Very useful when not using default player starting locations,
+     * such as the corners of the board
+     */
     private void clonePlayers() {
         beginningPlayers = new ArrayList<>();
         for (Player player : aPlayers) {
@@ -197,10 +203,8 @@ public class BoardController
                 collidedLocations.add(new Player(aPlayer.xArrayLocation, aPlayer.yArrayLocation, new Color(Color.LIGHT_GRAY),
                         aPlayer.width, aPlayer.height, false));
                 Animations aStar = aMenuController.createStarAnimations();
-                aStar.setX(aPlayer.xArrayLocation * aPlayer.width);
-                aStar.setY(aPlayer.yArrayLocation * aPlayer.height);
-                aStar.setWidth(aPlayer.width);
-                aStar.setHeight(aPlayer.height);
+                //Sets the location and size of where an animation should occur when a collision happens
+                aStar.setLocationAndSize(aPlayer.xArrayLocation, aPlayer.yArrayLocation, aPlayer.width, aPlayer.height);
                 collidedStars.add(aStar);
                 break;
             } else {
@@ -263,7 +267,12 @@ public class BoardController
         }
     }
 
-    public void clearCollisionStars(Group starGroup, Array<Animations> arrayOfActors)
+    /**
+     * Removes a collision animation from the board
+     * @param starGroup Group
+     * @param arrayOfActors Array<Animations>
+     */
+    public void clearCollisionAnimation(Group starGroup, Array<Animations> arrayOfActors)
     {
         for (Actor anActor : arrayOfActors)
         {
@@ -303,6 +312,10 @@ public class BoardController
         }
     }
 
+    /**
+     * Draws basic rectangle shapes on the screen
+     * @param renderer ShapeRenderer
+     */
     public void drawBoard(ShapeRenderer renderer)
     {
         for (int i = 0; i < tileBoard.getPiecesArray().length; i++)

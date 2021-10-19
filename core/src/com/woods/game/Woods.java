@@ -69,7 +69,7 @@ public class Woods extends Game
         menuTextures = new HashMap<>();
         textFields = new HashMap<>();
         boardTextures = new Texture[10];
-        this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //Sets the game size, the full width/height is the entire length in pixels
+        this.camera = new OrthographicCamera(50, 50); //Sets the game size, the full width/height is the entire length in pixels
         camera.setToOrtho(true);
         aViewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
         aViewport.apply();
