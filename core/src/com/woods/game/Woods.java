@@ -47,6 +47,7 @@ public class Woods extends Game
     Music forestMusic;
     Music scaryMusic;
     Sound found;
+    Sound invalidInput;
     OrthographicCamera camera;
     Viewport aViewport;
     Skin someSkin;
@@ -86,6 +87,7 @@ public class Woods extends Game
         this.forestMusic = Gdx.audio.newMusic(Gdx.files.internal("nightForest.mp3"));
         this.scaryMusic = Gdx.audio.newMusic(Gdx.files.internal("scary.mp3"));
         this.found = Gdx.audio.newSound(Gdx.files.internal("found.wav"));
+        this.invalidInput = Gdx.audio.newSound(Gdx.files.internal("invalidInput.mp3"));
         createButtons();
         createMenuButtons();
         createListeners();

@@ -173,9 +173,9 @@ public class BoardController
             case 3:
                 aPlayers.add(new Player(numberOfColumns - 1, numberOfRows - 1, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
             case 2:
-                aPlayers.add(new Player(numberOfRows - 1, 0, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
+                aPlayers.add(new Player(numberOfColumns - 1, 0, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
             case 1:
-                aPlayers.add(new Player(0, numberOfColumns - 1, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
+                aPlayers.add(new Player(0, numberOfRows - 1, Color.FIREBRICK, pixelBlockWidth, pixelBlockHeight, false));
         }
         clonePlayers();
     }

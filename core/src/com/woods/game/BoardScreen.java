@@ -298,7 +298,7 @@ public class BoardScreen implements Screen
             changeScreens();
         }
 
-        if (stateOfGame == State.PLACEMENT){
+        if (stateOfGame == State.PLACEMENT) {
             Vector3 v = mousePositionInWorld(theCamera);
             int mouseX = (int) v.x;
             int mouseY = (int) v.y;
@@ -308,13 +308,18 @@ public class BoardScreen implements Screen
             if (columns > 20) {
                 this.playerUp = aBoardController.findPlayer(xArrayLocation, yArrayLocation);
             }
-            if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-                System.out.printf("%d / %f = %d%n",mouseX, aBoardController.pixelBlockWidth, xArrayLocation);
-                System.out.printf("%d / %f = %d%n",mouseY, aBoardController.pixelBlockHeight, yArrayLocation);
+            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                System.out.printf("%d / %f = %d%n", mouseX, aBoardController.pixelBlockWidth, xArrayLocation);
+                System.out.printf("%d / %f = %d%n", mouseY, aBoardController.pixelBlockHeight, yArrayLocation);
 
-                    aBoardController.createUpdatePlayer(xArrayLocation, yArrayLocation, changeMovement);
-            } else if (Gdx.input.isKeyPressed(Input.Keys.ENTER) && aBoardController.aPlayers.size()>=2){
-                this.stateOfGame = State.RUN;
+                aBoardController.createUpdatePlayer(xArrayLocation, yArrayLocation, changeMovement);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+                if (aBoardController.aPlayers.size() >= 2) {
+                    this.stateOfGame = State.RUN;
+                } else {
+                    game.invalidInput.play();
+                }
             }
         }
 

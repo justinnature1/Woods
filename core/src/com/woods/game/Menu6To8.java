@@ -3,6 +3,7 @@ package com.woods.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -117,25 +118,34 @@ public class Menu6To8 implements Screen, Menu {
         return false;
     }
 
+    private boolean isInt(String string) { // assuming integer is in decimal number system
+        if (string == "") //Null values are not ints
+            return false;
+        //Loops through each character and checks if they are digits
+        for (int i = 0; i < string.length(); i++) {
+            if (!Character.isDigit(string.charAt(i))) return false;
+        }
+        return true;
+    }
+
+    private boolean isValidBoardSize(int side){
+        if (side >= 2 && side <= 50){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public void addListeners() {
         rowTextField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char c) {
-                boolean done = false;
-
-                while (!done) {
-                    try {
-                        int tempRows = Integer.parseInt(textField.getText());
-                        if (tempRows >= 2 && tempRows <= 50) {
-                            rows = tempRows;
-                        }
-                        done = true;
-                    } catch (Exception e) {
-                        System.err.println(e);
-                        break;
-                    }
+                int tempRows = 0;
+                if (isInt(textField.getText())){
+                    tempRows = Integer.parseInt(textField.getText());
                 }
+                rows = tempRows;
             }
         });
 
@@ -143,30 +153,25 @@ public class Menu6To8 implements Screen, Menu {
         colTextField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char c) {
-                boolean done = false;
-
-                while (!done) {
-                    try {
-                        int tempColumns = Integer.parseInt(textField.getText());
-                        if (tempColumns >= 2 && tempColumns <= 50) {
-                            columns = tempColumns;
-                            done = true;
-                        } else {
-                            break;
-                        }
-                    } catch (Exception e) {
-                        System.err.println(e);
-                        break;
-                    }
+                int tempColumns = 0;
+                if (isInt(textField.getText())){
+                    tempColumns = Integer.parseInt(textField.getText());
                 }
+                columns = tempColumns;
             }
         });
 
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.forestMusic.stop();
-                game.setScreen(new BoardScreen(game, menu6To8, rows, columns, true));
+                if (isValidBoardSize(rows) && isValidBoardSize(columns)) {
+                    game.forestMusic.stop();
+                    game.setScreen(new BoardScreen(game, menu6To8, rows, columns, true));
+                    rowTextField.getStyle().fontColor = Color.WHITE;
+                } else {
+                    rowTextField.getStyle().fontColor = Color.RED;
+                    game.invalidInput.play();
+                }
             }
         });
 
